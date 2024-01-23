@@ -19,7 +19,9 @@ struct HomeView: View {
                     Button {} label: { Image(systemName: "plus.circle") }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {} label: { Image(systemName: "bell") }
+                    NavigationLink(destination: NotificationsView()) {
+                        Image(systemName: "bell")
+                    }
                 }
             }
         }

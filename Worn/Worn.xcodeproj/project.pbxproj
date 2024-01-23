@@ -16,6 +16,7 @@
 		DF5EFD112B5FADCB00EE36F6 /* NewItemListViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD102B5FADCB00EE36F6 /* NewItemListViews.swift */; };
 		DF5EFD132B5FB13E00EE36F6 /* Countries.json in Resources */ = {isa = PBXBuildFile; fileRef = DF5EFD122B5FB13E00EE36F6 /* Countries.json */; };
 		DF5EFD152B5FBE7A00EE36F6 /* Materials.json in Resources */ = {isa = PBXBuildFile; fileRef = DF5EFD142B5FBE7A00EE36F6 /* Materials.json */; };
+		DF5EFD1A2B602E1E00EE36F6 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD192B602E1E00EE36F6 /* NotificationsView.swift */; };
 		DF7AD0162B59A50D001C804C /* WornApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7AD0152B59A50D001C804C /* WornApp.swift */; };
 		DF7AD0182B59A50D001C804C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7AD0172B59A50D001C804C /* ContentView.swift */; };
 		DF7AD01C2B59A511001C804C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF7AD01B2B59A511001C804C /* Assets.xcassets */; };
@@ -57,6 +58,7 @@
 		DF5EFD102B5FADCB00EE36F6 /* NewItemListViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewItemListViews.swift; sourceTree = "<group>"; };
 		DF5EFD122B5FB13E00EE36F6 /* Countries.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Countries.json; sourceTree = "<group>"; };
 		DF5EFD142B5FBE7A00EE36F6 /* Materials.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Materials.json; sourceTree = "<group>"; };
+		DF5EFD192B602E1E00EE36F6 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
 		DF7AD0122B59A50D001C804C /* Worn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Worn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF7AD0152B59A50D001C804C /* WornApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WornApp.swift; sourceTree = "<group>"; };
 		DF7AD0172B59A50D001C804C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -131,13 +133,38 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		DF5EFD0F2B5FADA800EE36F6 /* Closet */ = {
+		DF5EFD0F2B5FADA800EE36F6 /* ClosetTab */ = {
 			isa = PBXGroup;
 			children = (
 				DF7AD0492B59B752001C804C /* ClosetView.swift */,
 				DF5EFD102B5FADCB00EE36F6 /* NewItemListViews.swift */,
 			);
-			path = Closet;
+			path = ClosetTab;
+			sourceTree = "<group>";
+		};
+		DF5EFD162B602DBA00EE36F6 /* HomeTab */ = {
+			isa = PBXGroup;
+			children = (
+				DF7AD0452B59B6CF001C804C /* HomeView.swift */,
+				DF5EFD192B602E1E00EE36F6 /* NotificationsView.swift */,
+			);
+			path = HomeTab;
+			sourceTree = "<group>";
+		};
+		DF5EFD172B602DDF00EE36F6 /* ExploreTab */ = {
+			isa = PBXGroup;
+			children = (
+				DF7AD0472B59B716001C804C /* ExploreView.swift */,
+			);
+			path = ExploreTab;
+			sourceTree = "<group>";
+		};
+		DF5EFD182B602DED00EE36F6 /* YouTab */ = {
+			isa = PBXGroup;
+			children = (
+				DF7AD04B2B59B776001C804C /* YouView.swift */,
+			);
+			path = YouTab;
 			sourceTree = "<group>";
 		};
 		DF7AD0092B59A50C001C804C = {
@@ -163,15 +190,15 @@
 		DF7AD0142B59A50D001C804C /* Worn */ = {
 			isa = PBXGroup;
 			children = (
-				DF5EFD082B5F8A4400EE36F6 /* Models */,
-				DF5EFD052B5F834500EE36F6 /* Extensions */,
 				DF5EFCFC2B5DAB8100EE36F6 /* Data */,
+				DF5EFD052B5F834500EE36F6 /* Extensions */,
+				DF5EFD082B5F8A4400EE36F6 /* Models */,
 				DF7AD0152B59A50D001C804C /* WornApp.swift */,
 				DF7AD0172B59A50D001C804C /* ContentView.swift */,
-				DF7AD0452B59B6CF001C804C /* HomeView.swift */,
-				DF7AD0472B59B716001C804C /* ExploreView.swift */,
-				DF5EFD0F2B5FADA800EE36F6 /* Closet */,
-				DF7AD04B2B59B776001C804C /* YouView.swift */,
+				DF5EFD162B602DBA00EE36F6 /* HomeTab */,
+				DF5EFD0F2B5FADA800EE36F6 /* ClosetTab */,
+				DF5EFD172B602DDF00EE36F6 /* ExploreTab */,
+				DF5EFD182B602DED00EE36F6 /* YouTab */,
 				DF7AD01B2B59A511001C804C /* Assets.xcassets */,
 				DF7AD0202B59A511001C804C /* Worn.entitlements */,
 				DF7AD0212B59A511001C804C /* Info.plist */,
@@ -344,6 +371,7 @@
 				DF7AD0182B59A50D001C804C /* ContentView.swift in Sources */,
 				DF7AD0462B59B6CF001C804C /* HomeView.swift in Sources */,
 				DF5EFD0E2B5F8B2900EE36F6 /* ItemDetails.swift in Sources */,
+				DF5EFD1A2B602E1E00EE36F6 /* NotificationsView.swift in Sources */,
 				DF7AD04A2B59B752001C804C /* ClosetView.swift in Sources */,
 				DF5EFD112B5FADCB00EE36F6 /* NewItemListViews.swift in Sources */,
 				DF5EFD072B5F835C00EE36F6 /* ColorExtension.swift in Sources */,
