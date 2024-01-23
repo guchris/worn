@@ -13,7 +13,7 @@ struct ClosetView: View {
     @Environment(\.modelContext) var context
     @State private var searchText = ""
     @State private var isShowingClosetItemSheet = false
-    @Query(sort: \ClosetItem.name) var closetItems: [ClosetItem] = []
+    @Query(sort: \Item.name) var closetItems: [Item] = []
     
     var body: some View {
         NavigationStack {
@@ -69,7 +69,7 @@ struct ClosetView: View {
 
 struct ClosetItemCell: View {
     
-    let closetItem: ClosetItem
+    let closetItem: Item
     
     var body: some View {
         HStack {
@@ -108,12 +108,17 @@ struct AddClosetItemSheet: View {
     @State private var selectedColor: CustomColor?
     
     @State private var material: String = ""
+    @State private var selectedMaterials: [UserInputMaterial] = []
+    
     @State private var madeIn: String = ""
+    @State private var selectedCountry: Country?
+    
     @State private var cost: Double = 0
     @State private var purchaseDate: Date = .now
     @State private var note: String = ""
     
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var createdDate: Date = .now
     
     var body: some View {
         NavigationStack {
@@ -215,8 +220,41 @@ struct AddClosetItemSheet: View {
                         color = selectedColor?.name ?? ""
                     }
                     
-                    TextField("Material", text: $material)
-                    TextField("Made in", text: $madeIn)
+                    NavigationLink {
+                        MaterialListView(selectedMaterials: $selectedMaterials)
+                    } label: {
+                        HStack {
+                            Text("Material")
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    ForEach(selectedMaterials) { material in
+                                        let percentageString = "\(Int(material.percentage))%"
+                                        Text("\(percentageString) \(material.name)")
+                                    }
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                    
+                    NavigationLink {
+                        CountryListView(selectedCountry: $selectedCountry)
+                    } label: {
+                        HStack {
+                            Text("Made in")
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedCountry?.name ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+                    .onChange(of: selectedCountry) {
+                        madeIn = selectedCountry?.name ?? ""
+                    }
                 }
                 
                 Section(header: Text("Purchase Info")) {
@@ -243,7 +281,8 @@ struct AddClosetItemSheet: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("Save") {
-                        let closetItem = ClosetItem(image: image, name: name, brand: brand, category: category, size: size, color: color, material: material, madeIn: madeIn, cost: cost, purchaseDate: purchaseDate, note: note)
+                        createdDate = .now
+                        let closetItem = Item(image: image, name: name, brand: brand, category: category, size: size, color: color, material: material, madeIn: madeIn, cost: cost, purchaseDate: purchaseDate, note: note, createdDate: createdDate)
                         context.insert(closetItem)
                         dismiss()
                     }
@@ -258,220 +297,6 @@ struct AddClosetItemSheet: View {
                 }
             }
         }
-    }
-}
-
-
-/* New Item: Size Field */
-
-struct SizeListView: View {
-    @Binding var selectedSize: Size?
-    @State private var sizes = loadSizesFromJSON()
-    @State private var searchText = ""
-    @Environment(\.presentationMode) private var presentationMode
-    
-    var filteredSizes: [Size] {
-        if searchText.isEmpty {
-            return sizes
-        } else {
-            return sizes.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-
-    var body: some View {
-        List {
-            ForEach(filteredSizes) { size in
-                Button(action: {
-                    selectedSize = size
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Text(size.name)
-                            .foregroundColor(.black)
-                        Spacer()
-                        if selectedSize?.id == size.id {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("Select Size")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-    }
-}
-
-func loadSizesFromJSON() -> [Size] {
-    if let url = Bundle.main.url(forResource: "Sizes", withExtension: "json"),
-       let data = try? Data(contentsOf: url),
-       let sizes = try? JSONDecoder().decode([Size].self, from: data) {
-        return sizes
-    } else {
-        print("Error decoding sizes from JSON")
-        return []
-    }
-}
-
-
-/* New Item: Category Field */
-
-struct CategoryListView: View {
-    @Binding var selectedCategory: Category?
-    @State private var categories = loadCategoriesFromJSON()
-    @State private var searchText = ""
-    @Environment(\.presentationMode) private var presentationMode
-    
-    var filteredCategories: [Category] {
-        if searchText.isEmpty {
-            return categories
-        } else {
-            return categories.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-
-    var body: some View {
-        List {
-            ForEach(filteredCategories) { category in
-                Button(action: {
-                    selectedCategory = category
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Text(category.name)
-                            .foregroundColor(.black)
-                        Spacer()
-                        if selectedCategory?.id == category.id {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("Select Category")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-    }
-}
-
-func loadCategoriesFromJSON() -> [Category] {
-    if let url = Bundle.main.url(forResource: "Categories", withExtension: "json"),
-       let data = try? Data(contentsOf: url),
-       let categories = try? JSONDecoder().decode([Category].self, from: data) {
-        return categories
-    } else {
-        print("Error decoding categories from JSON")
-        return []
-    }
-}
-
-
-/* New Item: Brand Field */
-
-struct BrandListView: View {
-    @Binding var selectedBrand: Brand?
-    @State private var brands = loadBrandsFromJSON()
-    @State private var searchText = ""
-    @Environment(\.presentationMode) private var presentationMode
-    
-    var filteredBrands: [Brand] {
-        if searchText.isEmpty {
-            return brands
-        } else {
-            return brands.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-
-    var body: some View {
-        List {
-            ForEach(filteredBrands) { brand in
-                Button(action: {
-                    selectedBrand = brand
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        Text(brand.name)
-                            .foregroundColor(.black)
-                        Spacer()
-                        if selectedBrand?.id == brand.id {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("Select Brand")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-    }
-}
-
-func loadBrandsFromJSON() -> [Brand] {
-    if let url = Bundle.main.url(forResource: "Brands", withExtension: "json"),
-       let data = try? Data(contentsOf: url),
-       let brands = try? JSONDecoder().decode([Brand].self, from: data) {
-        return brands
-    } else {
-        print("Error decoding brands from JSON")
-        return []
-    }
-}
-
-/* New Item: Color Field */
-
-struct ColorListView: View {
-    @Binding var selectedColor: CustomColor?
-    @State private var colors = loadColorsFromJSON()
-    @State private var searchText = ""
-    @Environment(\.presentationMode) private var presentationMode
-    
-    var filteredColors: [CustomColor] {
-        if searchText.isEmpty {
-            return colors
-        } else {
-            return colors.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-
-    var body: some View {
-        List {
-            ForEach(filteredColors) { color in
-                Button(action: {
-                    selectedColor = color
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack {
-                        RoundedRectangle(cornerRadius: 8)
-                            .foregroundColor(Color(hex: color.hex))
-                            .frame(width: 30, height: 30)
-                        Text(color.name)
-                            .foregroundColor(.black)
-                        Spacer()
-                        if selectedColor?.id == color.id {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(.blue)
-                        }
-                    }
-                }
-            }
-        }
-        .navigationTitle("Select Color")
-        .navigationBarTitleDisplayMode(.inline)
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-    }
-}
-
-func loadColorsFromJSON() -> [CustomColor] {
-    if let url = Bundle.main.url(forResource: "Colors", withExtension: "json"),
-       let data = try? Data(contentsOf: url),
-       let colors = try? JSONDecoder().decode([CustomColor].self, from: data) {
-        return colors
-    } else {
-        print("Error decoding brands from JSON")
-        return []
     }
 }
 

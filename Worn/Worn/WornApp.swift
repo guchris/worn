@@ -15,6 +15,6 @@ struct WornApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: ClosetItem.self)
+        .modelContainer(for: Item.self)
     }
 }
