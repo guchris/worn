@@ -1,5 +1,5 @@
 //
-//  ClosetItemModels.swift
+//  ItemModels.swift
 //  Worn
 //
 //  Created by Christopher Gu on 1/22/24.
