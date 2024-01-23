@@ -105,6 +105,8 @@ struct AddClosetItemSheet: View {
     @State private var selectedSize: Size?
     
     @State private var color: String = ""
+    @State private var selectedColor: CustomColor?
+    
     @State private var material: String = ""
     @State private var madeIn: String = ""
     @State private var cost: Double = 0
@@ -157,6 +159,9 @@ struct AddClosetItemSheet: View {
                             }
                         }
                     }
+                    .onChange(of: selectedBrand) {
+                        brand = selectedBrand?.name ?? ""
+                    }
                     
 
                     NavigationLink {
@@ -172,6 +177,9 @@ struct AddClosetItemSheet: View {
                             }
                         }
                     }
+                    .onChange(of: selectedCategory) {
+                        category = selectedCategory?.name ?? ""
+                    }
                     
                     NavigationLink {
                         SizeListView(selectedSize: $selectedSize)
@@ -186,8 +194,27 @@ struct AddClosetItemSheet: View {
                             }
                         }
                     }
+                    .onChange(of: selectedSize) {
+                        size = selectedSize?.name ?? ""
+                    }
                     
-                    TextField("Color", text: $color)
+                    NavigationLink {
+                        ColorListView(selectedColor: $selectedColor)
+                    } label: {
+                        HStack {
+                            Text("Color")
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedColor?.name ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+                    .onChange(of: selectedColor) {
+                        color = selectedColor?.name ?? ""
+                    }
+                    
                     TextField("Material", text: $material)
                     TextField("Made in", text: $madeIn)
                 }
@@ -202,7 +229,11 @@ struct AddClosetItemSheet: View {
                     DatePicker("Date", selection: $purchaseDate, displayedComponents: .date)
                 }
                 
-                TextField("Note", text: $note)
+                Section(header: Text("Notes")) {
+                    TextEditor(text: $note)
+                        .frame(minHeight: 100)
+                }
+                
             }
             .navigationTitle("New Item")
             .navigationBarTitleDisplayMode(.inline)
@@ -232,11 +263,6 @@ struct AddClosetItemSheet: View {
 
 
 /* New Item: Size Field */
-
-struct Size: Identifiable, Decodable {
-    let id: Int
-    let name: String
-}
 
 struct SizeListView: View {
     @Binding var selectedSize: Size?
@@ -291,11 +317,6 @@ func loadSizesFromJSON() -> [Size] {
 
 /* New Item: Category Field */
 
-struct Category: Identifiable, Decodable {
-    let id: Int
-    let name: String
-}
-
 struct CategoryListView: View {
     @Binding var selectedCategory: Category?
     @State private var categories = loadCategoriesFromJSON()
@@ -349,11 +370,6 @@ func loadCategoriesFromJSON() -> [Category] {
 
 /* New Item: Brand Field */
 
-struct Brand: Identifiable, Decodable {
-    let id: Int
-    let name: String
-}
-
 struct BrandListView: View {
     @Binding var selectedBrand: Brand?
     @State private var brands = loadBrandsFromJSON()
@@ -398,6 +414,61 @@ func loadBrandsFromJSON() -> [Brand] {
        let data = try? Data(contentsOf: url),
        let brands = try? JSONDecoder().decode([Brand].self, from: data) {
         return brands
+    } else {
+        print("Error decoding brands from JSON")
+        return []
+    }
+}
+
+/* New Item: Color Field */
+
+struct ColorListView: View {
+    @Binding var selectedColor: CustomColor?
+    @State private var colors = loadColorsFromJSON()
+    @State private var searchText = ""
+    @Environment(\.presentationMode) private var presentationMode
+    
+    var filteredColors: [CustomColor] {
+        if searchText.isEmpty {
+            return colors
+        } else {
+            return colors.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
+
+    var body: some View {
+        List {
+            ForEach(filteredColors) { color in
+                Button(action: {
+                    selectedColor = color
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .foregroundColor(Color(hex: color.hex))
+                            .frame(width: 30, height: 30)
+                        Text(color.name)
+                            .foregroundColor(.black)
+                        Spacer()
+                        if selectedColor?.id == color.id {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Select Color")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+    }
+}
+
+func loadColorsFromJSON() -> [CustomColor] {
+    if let url = Bundle.main.url(forResource: "Colors", withExtension: "json"),
+       let data = try? Data(contentsOf: url),
+       let colors = try? JSONDecoder().decode([CustomColor].self, from: data) {
+        return colors
     } else {
         print("Error decoding brands from JSON")
         return []
