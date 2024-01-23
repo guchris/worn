@@ -1,0 +1,16 @@
+[
+    {"id": 1, "name": "Blouses"},
+    {"id": 2, "name": "Bodysuits"},
+    {"id": 3, "name": "Button-Up Shirts"},
+    {"id": 4, "name": "Crop Tops"},
+    {"id": 5, "name": "Hoodies"},
+    {"id": 6, "name": "Overshirts"},
+    {"id": 7, "name": "Polos"},
+    {"id": 8, "name": "Sweaters"},
+    {"id": 9, "name": "Sweater Vests"},
+    {"id": 10, "name": "Sweatshirts"},
+    {"id": 11, "name": "Sports Tops"},
+    {"id": 12, "name": "T-Shirts Long Sleeve"},
+    {"id": 13, "name": "T-Shirts Short Sleeve"},
+    {"id": 14, "name": "Tank Tops"}
+]

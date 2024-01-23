@@ -94,7 +94,9 @@ struct AddClosetItemSheet: View {
     
     @State private var image: Data = Data()
     @State private var name: String = ""
+    
     @State private var brand: String = ""
+    @State private var selectedBrand: Brand?
     
     @State private var category: String = ""
     @State private var selectedCategory: Category?
@@ -115,13 +117,14 @@ struct AddClosetItemSheet: View {
         NavigationStack {
             Form {
                 
-                Section(header: Text("Item Photo")) {
+                Section(header: Text("Photo")) {
                     
                     // Turn photo data into UIImage
                     if !image.isEmpty, let uiImage = UIImage(data: image) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .scaledToFit()
+                            .cornerRadius(8)
                     }
                     
                     PhotosPicker(selection: $selectedPhoto, matching: .images, photoLibrary: .shared()) {
@@ -138,28 +141,49 @@ struct AddClosetItemSheet: View {
                     }
                 }
                 
-                Section(header: Text("Item Details")) {
+                Section(header: Text("Details")) {
                     TextField("Name", text: $name)
-                    TextField("Brand", text: $brand)
                     
+                    NavigationLink {
+                        BrandListView(selectedBrand: $selectedBrand)
+                    } label: {
+                        HStack {
+                            Text("Brand")
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedBrand?.name ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+                    
+
                     NavigationLink {
                         CategoryListView(selectedCategory: $selectedCategory)
                     } label: {
                         HStack {
                             Text("Category")
-                            Spacer()
-                            Text(selectedCategory?.value ?? "")
-                                .foregroundColor(.secondary)
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedCategory?.name ?? "")
+                                Spacer()
+                            }
                         }
                     }
+                    
                     NavigationLink {
                         SizeListView(selectedSize: $selectedSize)
                     } label: {
                         HStack {
                             Text("Size")
-                            Spacer()
-                            Text(selectedSize?.value ?? "")
-                                .foregroundColor(.secondary)
+                                .font(.headline)
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedSize?.name ?? "")
+                                Spacer()
+                            }
                         }
                     }
                     
@@ -206,34 +230,37 @@ struct AddClosetItemSheet: View {
     }
 }
 
-struct Size: Identifiable {
-    let value: String
-    let id = UUID()
+
+/* New Item: Size Field */
+
+struct Size: Identifiable, Decodable {
+    let id: Int
+    let name: String
 }
-
-
-private var sizes = [
-    Size(value: "XXS"),
-    Size(value: "XS"),
-    Size(value: "S"),
-    Size(value: "M"),
-    Size(value: "L"),
-    Size(value: "XL"),
-    Size(value: "XXL"),
-    Size(value: "XXXL")
-]
 
 struct SizeListView: View {
     @Binding var selectedSize: Size?
+    @State private var sizes = loadSizesFromJSON()
+    @State private var searchText = ""
+    @Environment(\.presentationMode) private var presentationMode
+    
+    var filteredSizes: [Size] {
+        if searchText.isEmpty {
+            return sizes
+        } else {
+            return sizes.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
 
     var body: some View {
         List {
-            ForEach(sizes) { size in
+            ForEach(filteredSizes) { size in
                 Button(action: {
                     selectedSize = size
+                    presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
-                        Text(size.value)
+                        Text(size.name)
                             .foregroundColor(.black)
                         Spacer()
                         if selectedSize?.id == size.id {
@@ -246,44 +273,52 @@ struct SizeListView: View {
         }
         .navigationTitle("Select Size")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+    }
+}
+
+func loadSizesFromJSON() -> [Size] {
+    if let url = Bundle.main.url(forResource: "Sizes", withExtension: "json"),
+       let data = try? Data(contentsOf: url),
+       let sizes = try? JSONDecoder().decode([Size].self, from: data) {
+        return sizes
+    } else {
+        print("Error decoding sizes from JSON")
+        return []
     }
 }
 
 
-struct Category: Identifiable {
-    let value: String
-    let id = UUID()
+/* New Item: Category Field */
+
+struct Category: Identifiable, Decodable {
+    let id: Int
+    let name: String
 }
-
-
-private var categories = [
-    Category(value: "Blouses"),
-    Category(value: "Bodysuits"),
-    Category(value: "Button-Up Shirts"),
-    Category(value: "Crop Tops"),
-    Category(value: "Hoodies"),
-    Category(value: "Overshirts"),
-    Category(value: "Polos"),
-    Category(value: "Sweaters"),
-    Category(value: "Sweater Vests"),
-    Category(value: "Sweatshirts"),
-    Category(value: "Sports Tops"),
-    Category(value: "T-Shirts Long Sleeve"),
-    Category(value: "T-Shirts Short Sleeve"),
-    Category(value: "Tank Tops")
-]
 
 struct CategoryListView: View {
     @Binding var selectedCategory: Category?
+    @State private var categories = loadCategoriesFromJSON()
+    @State private var searchText = ""
+    @Environment(\.presentationMode) private var presentationMode
+    
+    var filteredCategories: [Category] {
+        if searchText.isEmpty {
+            return categories
+        } else {
+            return categories.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
 
     var body: some View {
         List {
-            ForEach(categories) { category in
+            ForEach(filteredCategories) { category in
                 Button(action: {
                     selectedCategory = category
+                    presentationMode.wrappedValue.dismiss()
                 }) {
                     HStack {
-                        Text(category.value)
+                        Text(category.name)
                             .foregroundColor(.black)
                         Spacer()
                         if selectedCategory?.id == category.id {
@@ -294,8 +329,78 @@ struct CategoryListView: View {
                 }
             }
         }
-        .navigationTitle("Select Size")
+        .navigationTitle("Select Category")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+    }
+}
+
+func loadCategoriesFromJSON() -> [Category] {
+    if let url = Bundle.main.url(forResource: "Categories", withExtension: "json"),
+       let data = try? Data(contentsOf: url),
+       let categories = try? JSONDecoder().decode([Category].self, from: data) {
+        return categories
+    } else {
+        print("Error decoding categories from JSON")
+        return []
+    }
+}
+
+
+/* New Item: Brand Field */
+
+struct Brand: Identifiable, Decodable {
+    let id: Int
+    let name: String
+}
+
+struct BrandListView: View {
+    @Binding var selectedBrand: Brand?
+    @State private var brands = loadBrandsFromJSON()
+    @State private var searchText = ""
+    @Environment(\.presentationMode) private var presentationMode
+    
+    var filteredBrands: [Brand] {
+        if searchText.isEmpty {
+            return brands
+        } else {
+            return brands.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
+
+    var body: some View {
+        List {
+            ForEach(filteredBrands) { brand in
+                Button(action: {
+                    selectedBrand = brand
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        Text(brand.name)
+                            .foregroundColor(.black)
+                        Spacer()
+                        if selectedBrand?.id == brand.id {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Select Brand")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+    }
+}
+
+func loadBrandsFromJSON() -> [Brand] {
+    if let url = Bundle.main.url(forResource: "Brands", withExtension: "json"),
+       let data = try? Data(contentsOf: url),
+       let brands = try? JSONDecoder().decode([Brand].self, from: data) {
+        return brands
+    } else {
+        print("Error decoding brands from JSON")
+        return []
     }
 }
 
