@@ -11,7 +11,14 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                WeatherContainerView()
+                VStack(spacing: 24) {
+                    HStack {
+                        WeatherContainerView()
+                        Spacer()
+                    }
+                    OutfitsContainerView()
+                }
+                .padding(24)
             }
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
