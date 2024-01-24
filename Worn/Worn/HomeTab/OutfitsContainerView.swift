@@ -58,7 +58,7 @@ struct OutfitsContainerView: View {
             .padding(16)
             .background(RoundedRectangle(cornerRadius: 12).foregroundColor(.white))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.5), lineWidth: 1))
-            }
+        }
     }
 }
 

@@ -17,6 +17,7 @@ struct HomeView: View {
                         Spacer()
                     }
                     OutfitsContainerView()
+                    CleanContainerView()
                 }
                 .padding(24)
             }
