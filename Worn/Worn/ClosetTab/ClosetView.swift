@@ -11,12 +11,36 @@ import PhotosUI
 
 struct ClosetView: View {
     @Environment(\.modelContext) var context
+    
     @State private var searchText = ""
+    
+    @State private var selectedCategory: String?
+    @State private var selectedBrand: String?
+    @State private var selectedSize: String?
+    @State private var selectedColor: String?
+    @State private var selectedMaterial: String?
+    @State private var selectedCountry: String?
+    
     @State private var isShowingClosetItemSheet = false
-    @Query(sort: \Item.name) var closetItems: [Item] = []
+    @State private var isShowingFilterSheet = false
+    
+    @State private var filteredItems: [Item] = []
+    @Query(sort: \Item.createdDate) var closetItems: [Item] = []
+    
+    // Function to clear all filters
+    private func clearFilters() {
+        selectedCategory = nil
+        selectedBrand = nil
+        selectedSize = nil
+        selectedColor = nil
+        selectedMaterial = nil
+        selectedCountry = nil
+        filteredItems = closetItems
+    }
     
     var body: some View {
         NavigationStack {
+            
 //            List {
 //                ForEach(closetItems) { closetItem in
 //                    ClosetItemCell(closetItem: closetItem)
@@ -27,6 +51,7 @@ struct ClosetView: View {
 //                    }
 //                }
 //            }
+            
             ScrollView {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 1), count: 3), spacing: 1) {
                     ForEach(closetItems) { closetItem in
@@ -51,7 +76,9 @@ struct ClosetView: View {
                     } label: { Image(systemName: "plus.circle") }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {} label: { Image(systemName: "line.3.horizontal.decrease.circle") }
+                    Button {
+                        isShowingFilterSheet = true
+                    } label: { Image(systemName: "line.3.horizontal.decrease.circle") }
                 }
             }
             .overlay {
@@ -63,9 +90,171 @@ struct ClosetView: View {
                     })
                 }
             }
+            .sheet(isPresented: $isShowingFilterSheet) {
+                FilterOptionsSheet(
+                    selectedCategory: $selectedCategory,
+                    selectedBrand: $selectedBrand,
+                    selectedSize: $selectedSize,
+                    selectedColor: $selectedColor,
+                    filteredItems: $filteredItems,
+                    isShowingFilterSheet: $isShowingFilterSheet,
+                    clearFilters: clearFilters
+                )
+            }
         }
     }
 }
+
+struct FilterOptionsSheet: View {
+    @Binding var selectedCategory: String?
+    @Binding var selectedBrand: String?
+    @Binding var selectedSize: String?
+    @Binding var selectedColor: String?
+    
+    @State private var categories: [String] = []
+    @State private var brands: [String] = []
+    @State private var sizes: [String] = []
+    @State private var colors: [String] = []
+    
+    
+    @Binding var filteredItems: [Item]
+    @Binding var isShowingFilterSheet: Bool
+    var clearFilters: () -> Void
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                List {
+                    NavigationLink(destination: FilterOptionListView(selectedOption: $selectedCategory, options: categories)) {
+                        HStack {
+                            Text("Category")
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedCategory ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+                    
+                    NavigationLink(destination: FilterOptionListView(selectedOption: $selectedBrand, options: brands)) {
+                        HStack {
+                            Text("Brand")
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedBrand ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+
+                    NavigationLink(destination: FilterOptionListView(selectedOption: $selectedSize, options: sizes)) {
+                        HStack {
+                            Text("Size")
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedSize ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+
+                    NavigationLink(destination: FilterOptionListView(selectedOption: $selectedColor, options: colors)) {
+                        HStack {
+                            Text("Color")
+                                .frame(minWidth: 100, alignment: .leading)
+                            HStack {
+                                Text(selectedColor ?? "")
+                                Spacer()
+                            }
+                        }
+                    }
+                    
+                    Section {
+                        Button("Clear Filters") {
+                            clearFilters()
+                        }
+                    }
+                }
+            }
+            .onAppear {
+                loadFilterOptions()
+            }
+            .navigationTitle("Filter")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Done") {
+                isShowingFilterSheet = false
+            })
+        }
+    }
+    
+    private func loadFilterOptions() {
+        loadCategories()
+        loadBrands()
+        loadSizes()
+        loadColors()
+    }
+    
+    private func loadCategories() {
+        if let url = Bundle.main.url(forResource: "Categories", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let decodedCategories = try? JSONDecoder().decode([Category].self, from: data) {
+            categories = decodedCategories.map { $0.name }
+        }
+    }
+    
+    private func loadBrands() {
+        if let url = Bundle.main.url(forResource: "Brands", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let decodedBrands = try? JSONDecoder().decode([Brand].self, from: data) {
+            brands = decodedBrands.map { $0.name }
+        }
+    }
+    
+    private func loadSizes() {
+        if let url = Bundle.main.url(forResource: "Sizes", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let decodedSizes = try? JSONDecoder().decode([Size].self, from: data) {
+            sizes = decodedSizes.map { $0.name }
+        }
+    }
+    
+    private func loadColors() {
+        if let url = Bundle.main.url(forResource: "Colors", withExtension: "json"),
+           let data = try? Data(contentsOf: url),
+           let decodedColors = try? JSONDecoder().decode([CustomColor].self, from: data) {
+            colors = decodedColors.map { $0.name }
+        }
+    }
+}
+
+struct FilterOptionListView: View {
+    @Binding var selectedOption: String?
+    @Environment(\.presentationMode) private var presentationMode
+    var options: [String]
+    
+    var body: some View {
+        List {
+            ForEach(options, id: \.self) { option in
+                Button(action: {
+                    selectedOption = option
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        Text(option)
+                            .foregroundColor(.black)
+                        Spacer()
+                        if selectedOption == option {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationBarTitle("Select \(selectedOption ?? "")")
+    }
+}
+
 
 struct ClosetItemCell: View {
     
