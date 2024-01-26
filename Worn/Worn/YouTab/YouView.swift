@@ -9,15 +9,18 @@ import SwiftUI
 
 struct YouView: View {
     
+    @State private var showViewMore = true
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                    StatContainer(title: "Total Items", value: "100")
-                    StatContainer(title: "Total Cost", value: "$500")
-                    StatContainer(title: "Most Popular", value: "Sneakers")
-                    StatContainer(title: "Least Popular", value: "Hat")
+                    StatContainer(title: "Total Items", value: "100", showViewMore: false, details: nil)
+                    StatContainer(title: "Total Cost", value: "$500", showViewMore: false, details: nil)
                 }
+                
+                StatContainer(title: "Top Brand", value: "Acne Studios", showViewMore: true, details: ["Acne Studios", "Aimé Leon Dore", "Sandro", "Theory", "John Elliot", "On Running"])
+                StatContainer(title: "Top Category", value: "Sweater Vests", showViewMore: true, details: ["Sweater Vests", "Cargo Pants", "Crop Tops", "Cardigans"])
                 
                 BarGraph(dataPoints: [10, 30, 45, 25, 60, 35])
                     .frame(height: 200)
@@ -40,6 +43,8 @@ struct YouView: View {
 struct StatContainer: View {
     let title: String
     let value: String
+    let showViewMore: Bool
+    let details: [String]?
     
     var body: some View {
         HStack {
@@ -49,14 +54,35 @@ struct StatContainer: View {
                     .bold()
                     .foregroundColor(.secondary)
                 Text(value)
-                    .font(.title)
+                    .font(.title2)
                     .fontWeight(.bold)
+                if showViewMore, let details = details {
+                    HStack {
+                        NavigationLink(destination: DetailedListView(details: details)) {
+                            Text("View More")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
             }
             Spacer()
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).foregroundColor(.white))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.5), lineWidth: 1))
+    }
+}
+
+struct DetailedListView: View {
+    let details: [String]
+    
+    var body: some View {
+        List(details, id: \.self) { detail in
+            Text(detail)
+        }
+        .listStyle(InsetGroupedListStyle())
+        .navigationBarTitle("Details", displayMode: .inline)
     }
 }
 

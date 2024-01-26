@@ -78,7 +78,13 @@ struct ClosetView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         isShowingFilterSheet = true
-                    } label: { Image(systemName: "line.3.horizontal.decrease.circle") }
+                    } label: {
+                        if selectedCategory != nil || selectedBrand != nil || selectedSize != nil || selectedColor != nil {
+                            Image(systemName: "line.3.horizontal.circle.fill")
+                        } else {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                        }
+                    }
                 }
             }
             .overlay {
