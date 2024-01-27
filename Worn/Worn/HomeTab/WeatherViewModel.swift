@@ -14,10 +14,6 @@ class WeatherViewModel: ObservableObject {
 
     private var cancellables: Set<AnyCancellable> = []
 
-    init() {
-        fetchWeatherData()
-    }
-
     func fetchWeatherData() {
         let apiKey = "502a0e37e7614282b4b191417242301"
         let city = "Seattle"
@@ -29,7 +25,7 @@ class WeatherViewModel: ObservableObject {
         URLSession.shared.dataTaskPublisher(for: url)
             .map(\.data)
             .tryMap { data -> Data in
-                print("Received raw JSON data: \(String(data: data, encoding: .utf8) ?? "")")
+//                print("Received raw Weather JSON data: \(String(data: data, encoding: .utf8) ?? "")")
                 return data
             }
             .decode(type: WeatherData.self, decoder: JSONDecoder())
@@ -37,13 +33,13 @@ class WeatherViewModel: ObservableObject {
             .sink(receiveCompletion: { completion in
                 switch completion {
                     case .finished:
-                        print("API request completed.")
+                        print("Weather API request completed.")
                     case .failure(let error):
                         print("Error: \(error)")
                 }
             }) { [weak self] data in
                 self?.weatherData = data
-                print("Received weather data: \(data)")
+//                print("Received weather data: \(data)")
             }
             .store(in: &cancellables)
     }
@@ -59,7 +55,7 @@ class WeatherViewModel: ObservableObject {
         URLSession.shared.dataTaskPublisher(for: url)
             .map(\.data)
             .tryMap { data -> Data in
-                print("Received raw forecast JSON data: \(String(data: data, encoding: .utf8) ?? "")")
+//                print("Received raw Forecast JSON data: \(String(data: data, encoding: .utf8) ?? "")")
                 return data
             }
             .decode(type: ForecastData.self, decoder: JSONDecoder())
@@ -87,7 +83,7 @@ class WeatherViewModel: ObservableObject {
                 }
             }) { [weak self] data in
                 self?.forecastData = data
-                print("Received forecast data: \(data)")
+//                print("Received forecast data: \(data)")
             }
             .store(in: &cancellables)
     }

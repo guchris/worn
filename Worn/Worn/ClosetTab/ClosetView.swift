@@ -481,7 +481,7 @@ struct AddClosetItemSheet: View {
                         context.insert(closetItem)
                         dismiss()
                     }
-                    .disabled(image.isEmpty || name.isEmpty || brand.isEmpty)
+                    .disabled(image.isEmpty || name.isEmpty || brand.isEmpty || category.isEmpty)
                 }
             }
             .task(id: selectedPhoto) {

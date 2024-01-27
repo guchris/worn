@@ -16,22 +16,22 @@ struct YouView: View {
     @State private var totalSpent: Double = 0.0
     
     @State private var topBrand: String = ""
-    @State private var detailsForTopBrand: [String] = []
-
     @State private var topCategory: String = ""
-    @State private var detailsForTopCategory: [String] = []
+    
+    @State private var detailsForTopBrand: [(String, Int)] = []
+    @State private var detailsForTopCategory: [(String, Int)] = []
 
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                    StatContainer(title: "Total Items", value: "\(totalItems)", showViewMore: false, details: nil)
-                    StatContainer(title: "Total Spent", value: "$\(totalSpent)", showViewMore: false, details: nil)
+                    StatContainer(title: "Total Items", value: "\(totalItems)", showViewMore: false, subTitle: nil, details: nil)
+                    StatContainer(title: "Total Spent", value: "$\(totalSpent)", showViewMore: false, subTitle: nil, details: nil)
                 }
                 
-                StatContainer(title: "Top Brand", value: topBrand, showViewMore: true, details: detailsForTopBrand)
-                StatContainer(title: "Top Category", value: topCategory, showViewMore: true, details: detailsForTopCategory)
+                StatContainer(title: "Top Brand", value: topBrand, showViewMore: true, subTitle: "Top Brands", details: detailsForTopBrand)
+                StatContainer(title: "Top Category", value: topCategory, showViewMore: true, subTitle: "Top Categories", details: detailsForTopCategory)
                 
 //                BarGraph(dataPoints: [10, 30, 45, 25, 60, 35])
 //                    .frame(height: 200)
@@ -56,24 +56,60 @@ struct YouView: View {
     private func calculateStats() {
         totalItems = closetItems.count
         totalSpent = closetItems.reduce(0.0) { $0 + ($1.cost ?? 0.0) }
+        
 
         // Calculate top brand
         let brandCounts = Dictionary(grouping: closetItems, by: { $0.brand })
             .mapValues { $0.count }
-        topBrand = brandCounts.max { $0.value == $1.value ? $0.key < $1.key : $0.value < $1.value }?.key ?? ""
+        
+        // Sorting by count descending, and by creation date if counts are equal
+        let sortedBrands = brandCounts.sorted { (first, second) in
+            if first.value == second.value {
+                // Sort by creation date if counts are equal
+                guard let firstDate = closetItems.first(where: { $0.brand == first.key })?.createdDate,
+                      let secondDate = closetItems.first(where: { $0.brand == second.key })?.createdDate else {
+                    return false
+                }
+                return firstDate < secondDate
+            } else {
+                // Sort by count descending
+                return first.value > second.value
+            }
+        }
 
-        // Calculate details array for brands
-        detailsForTopBrand = brandCounts.sorted { $0.value > $1.value }
-            .map { $0.key }
+        // Set topBrand to the first element of the sorted array, if available
+        topBrand = sortedBrands.first?.key ?? ""
+
+        // Calculate details array for top brands
+        detailsForTopBrand = sortedBrands
+        
+        
+
 
         // Calculate top category
         let categoryCounts = Dictionary(grouping: closetItems, by: { $0.category })
             .mapValues { $0.count }
-        topCategory = categoryCounts.max { $0.value == $1.value ? $0.key ?? "" < $1.key ?? "" : $0.value < $1.value }?.key ?? ""
+        
+        // Sorting by count descending, and by creation date if counts are equal
+        let sortedCategories = categoryCounts.sorted { (first, second) in
+            if first.value == second.value {
+                // Sort by creation date if counts are equal
+                guard let firstDate = closetItems.first(where: { $0.category == first.key })?.createdDate,
+                      let secondDate = closetItems.first(where: { $0.category == second.key })?.createdDate else {
+                    return false
+                }
+                return firstDate < secondDate
+            } else {
+                // Sort by count descending
+                return first.value > second.value
+            }
+        }
 
-        // Calculate details array for categories
-        detailsForTopCategory = categoryCounts.sorted { $0.value > $1.value }
-            .map { $0.key ?? "" }
+        // Set topCategory to the first element of the sorted array, if available
+        topCategory = sortedCategories.first?.key ?? ""
+
+        // Calculate details array for top categories
+        detailsForTopCategory = sortedCategories
     }
 }
 
@@ -81,7 +117,8 @@ struct StatContainer: View {
     let title: String
     let value: String
     let showViewMore: Bool
-    let details: [String]?
+    let subTitle: String?
+    let details: [(String, Int)]?
 
     var body: some View {
         HStack {
@@ -95,7 +132,7 @@ struct StatContainer: View {
                     .fontWeight(.bold)
                 if showViewMore, let details = details {
                     HStack {
-                        NavigationLink(destination: DetailedListView(details: details)) {
+                        NavigationLink(destination: DetailedListView(subTitle: subTitle ?? "", details: details)) {
                             Text("View More")
                                 .frame(maxWidth: .infinity)
                         }
@@ -112,14 +149,19 @@ struct StatContainer: View {
 }
 
 struct DetailedListView: View {
-    let details: [String]
+    let subTitle: String
+    let details: [(String, Int)]
 
     var body: some View {
-        List(details, id: \.self) { detail in
-            Text(detail)
+        List(details, id: \.0) { detail in
+            HStack {
+                Text(detail.0)
+                Spacer()
+                Text("\(detail.1)")
+            }
         }
         .listStyle(InsetGroupedListStyle())
-        .navigationBarTitle("Details", displayMode: .inline)
+        .navigationBarTitle(subTitle, displayMode: .inline)
     }
 }
 
