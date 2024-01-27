@@ -6,24 +6,35 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct YouView: View {
-    
+    @Environment(\.modelContext) var context
+    @Query var closetItems: [Item] = []
     @State private var showViewMore = true
+    @State private var totalItems: Int = 0
+    @State private var totalSpent: Double = 0.0
+    
+    @State private var topBrand: String = ""
+    @State private var detailsForTopBrand: [String] = []
+
+    @State private var topCategory: String = ""
+    @State private var detailsForTopCategory: [String] = []
+
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
-                    StatContainer(title: "Total Items", value: "100", showViewMore: false, details: nil)
-                    StatContainer(title: "Total Cost", value: "$500", showViewMore: false, details: nil)
+                    StatContainer(title: "Total Items", value: "\(totalItems)", showViewMore: false, details: nil)
+                    StatContainer(title: "Total Spent", value: "$\(totalSpent)", showViewMore: false, details: nil)
                 }
                 
-                StatContainer(title: "Top Brand", value: "Acne Studios", showViewMore: true, details: ["Acne Studios", "Aimé Leon Dore", "Sandro", "Theory", "John Elliot", "On Running"])
-                StatContainer(title: "Top Category", value: "Sweater Vests", showViewMore: true, details: ["Sweater Vests", "Cargo Pants", "Crop Tops", "Cardigans"])
+                StatContainer(title: "Top Brand", value: topBrand, showViewMore: true, details: detailsForTopBrand)
+                StatContainer(title: "Top Category", value: topCategory, showViewMore: true, details: detailsForTopCategory)
                 
-                BarGraph(dataPoints: [10, 30, 45, 25, 60, 35])
-                    .frame(height: 200)
+//                BarGraph(dataPoints: [10, 30, 45, 25, 60, 35])
+//                    .frame(height: 200)
             }
             .padding(24)
             .navigationTitle("You")
@@ -36,7 +47,33 @@ struct YouView: View {
                     Button {} label: { Image(systemName: "gearshape") }
                 }
             }
+            .onAppear {
+                calculateStats()
+            }
         }
+    }
+    
+    private func calculateStats() {
+        totalItems = closetItems.count
+        totalSpent = closetItems.reduce(0.0) { $0 + ($1.cost ?? 0.0) }
+
+        // Calculate top brand
+        let brandCounts = Dictionary(grouping: closetItems, by: { $0.brand })
+            .mapValues { $0.count }
+        topBrand = brandCounts.max { $0.value == $1.value ? $0.key < $1.key : $0.value < $1.value }?.key ?? ""
+
+        // Calculate details array for brands
+        detailsForTopBrand = brandCounts.sorted { $0.value > $1.value }
+            .map { $0.key }
+
+        // Calculate top category
+        let categoryCounts = Dictionary(grouping: closetItems, by: { $0.category })
+            .mapValues { $0.count }
+        topCategory = categoryCounts.max { $0.value == $1.value ? $0.key ?? "" < $1.key ?? "" : $0.value < $1.value }?.key ?? ""
+
+        // Calculate details array for categories
+        detailsForTopCategory = categoryCounts.sorted { $0.value > $1.value }
+            .map { $0.key ?? "" }
     }
 }
 
@@ -45,7 +82,7 @@ struct StatContainer: View {
     let value: String
     let showViewMore: Bool
     let details: [String]?
-    
+
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
@@ -76,7 +113,7 @@ struct StatContainer: View {
 
 struct DetailedListView: View {
     let details: [String]
-    
+
     var body: some View {
         List(details, id: \.self) { detail in
             Text(detail)
