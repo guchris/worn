@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import Charts
 
 struct YouView: View {
     @Environment(\.modelContext) var context
@@ -151,16 +152,48 @@ struct StatContainer: View {
 struct DetailedListView: View {
     let subTitle: String
     let details: [(String, Int)]
+    @State private var selection = 0
 
     var body: some View {
-        List(details, id: \.0) { detail in
-            HStack {
-                Text(detail.0)
-                Spacer()
-                Text("\(detail.1)")
+        VStack {
+            
+            Picker(selection: $selection, label: Text("")) {
+                Text("List").tag(0)
+                Text("Chart").tag(1)
             }
+            .pickerStyle(SegmentedPickerStyle())
+            
+            
+            if selection == 0 {
+                List(details, id: \.0) { detail in
+                    HStack {
+                        Text(detail.0)
+                        Spacer()
+                        Text("\(detail.1)")
+                    }
+                }
+                .listStyle(.plain)
+            } else {
+                Chart {
+                    ForEach(details, id: \.0) { detail in
+                        SectorMark(angle: .value(detail.0, detail.1),
+                                   innerRadius: .ratio(0.618),
+                                   angularInset: 2)
+                            .foregroundStyle(by: .value("Name", detail.0))
+                            .cornerRadius(8)
+                            .annotation(position: .overlay) {
+                                Text("\(detail.1)")
+                                    .bold()
+                                    .foregroundStyle(.white)
+                            }
+                    }
+                }
+                .chartLegend(.hidden)
+            }
+            
+            Spacer()
         }
-        .listStyle(InsetGroupedListStyle())
+        .padding()
         .navigationBarTitle(subTitle, displayMode: .inline)
     }
 }
