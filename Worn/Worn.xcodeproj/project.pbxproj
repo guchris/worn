@@ -22,6 +22,7 @@
 		DF5EFD202B60445A00EE36F6 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD1F2B60445A00EE36F6 /* WeatherModels.swift */; };
 		DF5EFD222B6079BE00EE36F6 /* OutfitsContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD212B6079BE00EE36F6 /* OutfitsContainerView.swift */; };
 		DF5EFD242B6089F200EE36F6 /* CleanContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD232B6089F200EE36F6 /* CleanContainerView.swift */; };
+		DF5EFD282B774F9000EE36F6 /* DeepLabV3.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DF5EFD272B774F9000EE36F6 /* DeepLabV3.mlmodel */; };
 		DF7AD0162B59A50D001C804C /* WornApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7AD0152B59A50D001C804C /* WornApp.swift */; };
 		DF7AD0182B59A50D001C804C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7AD0172B59A50D001C804C /* ContentView.swift */; };
 		DF7AD01C2B59A511001C804C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DF7AD01B2B59A511001C804C /* Assets.xcassets */; };
@@ -69,6 +70,7 @@
 		DF5EFD1F2B60445A00EE36F6 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
 		DF5EFD212B6079BE00EE36F6 /* OutfitsContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutfitsContainerView.swift; sourceTree = "<group>"; };
 		DF5EFD232B6089F200EE36F6 /* CleanContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanContainerView.swift; sourceTree = "<group>"; };
+		DF5EFD272B774F9000EE36F6 /* DeepLabV3.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = DeepLabV3.mlmodel; sourceTree = "<group>"; };
 		DF7AD0122B59A50D001C804C /* Worn.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Worn.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DF7AD0152B59A50D001C804C /* WornApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WornApp.swift; sourceTree = "<group>"; };
 		DF7AD0172B59A50D001C804C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 		DF7AD0092B59A50C001C804C = {
 			isa = PBXGroup;
 			children = (
+				DF5EFD272B774F9000EE36F6 /* DeepLabV3.mlmodel */,
 				DF7AD0142B59A50D001C804C /* Worn */,
 				DF7AD0292B59A511001C804C /* WornTests */,
 				DF7AD0332B59A511001C804C /* WornUITests */,
@@ -392,6 +395,7 @@
 				DF7AD04A2B59B752001C804C /* ClosetView.swift in Sources */,
 				DF5EFD222B6079BE00EE36F6 /* OutfitsContainerView.swift in Sources */,
 				DF5EFD112B5FADCB00EE36F6 /* NewItemListViews.swift in Sources */,
+				DF5EFD282B774F9000EE36F6 /* DeepLabV3.mlmodel in Sources */,
 				DF5EFD072B5F835C00EE36F6 /* ColorExtension.swift in Sources */,
 				DF5EFD202B60445A00EE36F6 /* WeatherModels.swift in Sources */,
 				DF7AD04E2B59BC29001C804C /* Item.swift in Sources */,
