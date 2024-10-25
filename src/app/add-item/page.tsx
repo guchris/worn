@@ -5,8 +5,11 @@ import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
+// App Imports
+import { categoryOptions, sizeOptions, conditionOptions } from "@/lib/selectOptions"
+
 // Firebase Imports
-import { collection, addDoc } from "firebase/firestore"
+import { collection, addDoc, updateDoc } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 import { db, storage } from "@/lib/firebase"
 import { cn } from "@/lib/utils"
@@ -17,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
 // Shadcn Imports
+import { useToast } from "@/hooks/use-toast"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -30,18 +34,13 @@ import { format } from "date-fns"
 import { v4 as uuidv4 } from "uuid"
 
 
+
 // Validation Schema
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     brand: z.string().min(1, "Brand is required"),
-    category: z.object({
-        group: z.string().min(1, "Category group is required"),
-        value: z.string().min(1, "Category value is required"),
-    }),
-    size: z.object({
-        group: z.string().min(1, "Size group is required"),
-        value: z.string().min(1, "Size value is required"),
-    }),
+    category: z.string().min(1, "Category is required"),
+    size: z.string().min(1, "Size is required"),
     color: z.string().min(1, "Color is required"),
     condition: z.string().min(1, "Condition is required"),
     purchaseCost: z.coerce.number().min(0, "Cost must be positive"),
@@ -51,98 +50,18 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Define grouped categories
-const categories = [
-    { group: "Tops", items: ["Cardigans", "Coats", "Hoodies", "Jackets", "Overshirts", "Shirts", "Sweaters", "Sweatshirts", "Tank Tops", "Vests"] },
-    { group: "Bottoms", items: ["Leggings", "Pants", "Shorts", "Swim"] },
-    { group: "Accessories", items: ["Bags", "Hats", "Jewelry", "Scarfs", "Shoes", "Sunglasses"] },
-    { group: "Other", items: ["Onesies", "Overalls"] },
-];
-
-const sizeGroups = [
-    {
-        group: "General Sizes",
-        items: [
-            { label: "XS", value: "general_xs" },
-            { label: "S", value: "general_s" },
-            { label: "M", value: "general_m" },
-            { label: "L", value: "general_l" },
-            { label: "XL", value: "general_xl" },
-            { label: "OS (One Size)", value: "general_os" },
-        ],
-    },
-    {
-        group: "Numeric General Sizes",
-        items: [
-            { label: "0", value: "num_general_0" },
-            { label: "2", value: "num_general_2" },
-            { label: "4", value: "num_general_4" },
-            { label: "6", value: "num_general_6" },
-            { label: "8", value: "num_general_8" },
-            { label: "10", value: "num_general_10" },
-            { label: "12", value: "num_general_12" },
-            { label: "14", value: "num_general_14" },
-            { label: "16", value: "num_general_16" },
-            { label: "18", value: "num_general_18" },
-        ],
-    },
-    {
-        group: "Pant Sizes (Waist x Inseam)",
-        items: [
-            { label: "28x30", value: "pant_28x30" },
-            { label: "28x32", value: "pant_28x32" },
-            { label: "30x30", value: "pant_30x30" },
-            { label: "30x32", value: "pant_30x32" },
-            { label: "32x30", value: "pant_32x30" },
-            { label: "32x32", value: "pant_32x32" },
-            { label: "34x30", value: "pant_34x30" },
-            { label: "34x32", value: "pant_34x32" },
-            { label: "36x30", value: "pant_36x30" },
-            { label: "36x32", value: "pant_36x32" },
-            { label: "38x30", value: "pant_38x30" },
-            { label: "38x32", value: "pant_38x32" },
-        ],
-    },
-    {
-        group: "Men’s Shoe Sizes",
-        items: [
-            { label: "6", value: "mens_shoe_6" },
-            { label: "7", value: "mens_shoe_7" },
-            { label: "8", value: "mens_shoe_8" },
-            { label: "9", value: "mens_shoe_9" },
-            { label: "10", value: "mens_shoe_10" },
-            { label: "11", value: "mens_shoe_11" },
-            { label: "12", value: "mens_shoe_12" },
-            { label: "13", value: "mens_shoe_13" },
-        ],
-    },
-    {
-        group: "Women’s Shoe Sizes",
-        items: [
-            { label: "5", value: "womens_shoe_5" },
-            { label: "6", value: "womens_shoe_6" },
-            { label: "7", value: "womens_shoe_7" },
-            { label: "8", value: "womens_shoe_8" },
-            { label: "9", value: "womens_shoe_9" },
-            { label: "10", value: "womens_shoe_10" },
-            { label: "11", value: "womens_shoe_11" },
-        ],
-    },
-];
-
-
-
 export default function AddItem() {
     const router = useRouter();
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const { toast } = useToast();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
             brand: "",
-            category: { group: "", value: "" },
-            size: { group: "", value: "" },
+            category: "",
+            size: "",
             color: "",
             condition: "",
             purchaseCost: 0,
@@ -152,35 +71,52 @@ export default function AddItem() {
     });
 
     const onSubmit = async (values: FormValues) => {
-        try {
-            // Generate a unique UUID for this item
-            const itemId = uuidv4();
 
-            // Upload images to Firebase Storage under `items/{itemId}` and get download URLs
+        try {
+
+            const userId = "vhDFojFLrNIjkqo0vCmI";
+
+            // Parse the category and size values into objects with group and value
+            const [categoryGroup, categoryValue] = values.category.split('_');
+            const [sizeGroup, sizeValue] = values.size.split('_');
+
+            // Upload images to Firebase Storage under `items/{itemId}` and get image URLs
             const imageUrls = await Promise.all(
                 values.images.map(async (file) => {
-                    // Generate a unique UUID for each image file
                     const imageId = uuidv4();
-                    const storageRef = ref(storage, `items/${itemId}/${imageId}-${file.name}`);
+                    const storageRef = ref(storage, `items/${imageId}`);
                     await uploadBytes(storageRef, file);
                     return await getDownloadURL(storageRef);
                 })
             );
 
-            // Add item data with image URLs to Firestore
-            const docRef = await addDoc(collection(db, "closet"), {
-                id: itemId,
-                ...values,
-                category: values.category,
-                size: values.size,
-                purchaseDate: values.purchaseDate.toISOString(),
+            // Add item data with parsed values to Firestore
+            const docRef = await addDoc(collection(db, `users/${userId}/closet`), {
+                name: values.name,
+                brand: values.brand,
+                color: values.color,
+                condition: values.condition,
+                category: { group: categoryGroup, value: categoryValue },
+                size: { group: sizeGroup, value: sizeValue },
+                purchaseCost: values.purchaseCost,
+                purchaseDate: values.purchaseDate.toISOString().split("T")[0],
                 images: imageUrls,
             });
 
-            console.log("Document written with ID: ", docRef.id);
+            // Update the document to set its ID field with Firestore's auto-generated ID
+            await updateDoc(docRef, { id: docRef.id });
+
+            toast({
+                title: "Item added successfully!",
+                description: "Your clothing item has been added to your closet.",
+            });
             router.push("/");
         } catch (e) {
-            console.error("Error adding document: ", e);
+            console.error("Error adding item:", e);
+            toast({
+                title: "Error adding item",
+                description: "There was an error adding your item. Please try again.",
+            });
         }
     };
 
@@ -229,22 +165,20 @@ export default function AddItem() {
                                 <FormLabel>Category</FormLabel>
                                 <FormControl>
                                     <Select
-                                        onValueChange={(value) => {
-                                            // Find the group name for the selected value
-                                            const selectedGroup = categories.find(group => group.items.includes(value))?.group;
-                                            field.onChange({ group: selectedGroup, value }); // Store both group and value
-                                        }}
-                                        defaultValue={field.value?.value || ""}
+                                        onValueChange={(value) => field.onChange(value)}
+                                        defaultValue={field.value || ""}
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a category" />
+                                            <SelectValue placeholder="Select Category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {categories.map(({ group, items }) => (
+                                            {categoryOptions.map(({ group, items }) => (
                                                 <SelectGroup key={group}>
                                                     <SelectLabel>{group}</SelectLabel>
                                                     {items.map(item => (
-                                                        <SelectItem key={item} value={item.toLowerCase()}>{item}</SelectItem>
+                                                        <SelectItem key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectGroup>
                                             ))}
@@ -265,19 +199,14 @@ export default function AddItem() {
                                 <FormLabel>Size</FormLabel>
                                 <FormControl>
                                     <Select
-                                        onValueChange={(value) => {
-                                            const selectedGroup = sizeGroups.find(group =>
-                                                group.items.some(item => item.value === value)
-                                            )?.group;
-                                            field.onChange({ group: selectedGroup || "", value }); // Store as an object with group and value
-                                        }}
-                                        defaultValue={field.value?.value || ""}
+                                        onValueChange={(value) => field.onChange(value)}
+                                        defaultValue={field.value || ""}
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select Size" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {sizeGroups.map(({ group, items }) => (
+                                            {sizeOptions.map(({ group, items }) => (
                                                 <SelectGroup key={group}>
                                                     <SelectLabel>{group}</SelectLabel>
                                                     {items.map(item => (
@@ -321,13 +250,19 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Condition</FormLabel>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select
+                                        onValueChange={(value) => field.onChange(value)}
+                                        defaultValue={field.value || ""}
+                                    >
                                         <SelectTrigger>
-                                            {field.value || "Select Condition"}
+                                            <SelectValue placeholder="Select Condition" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="new">New</SelectItem>
-                                            <SelectItem value="used">Used</SelectItem>
+                                            {conditionOptions.map((option) => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </FormControl>
@@ -406,8 +341,8 @@ export default function AddItem() {
                                                     <Image
                                                         src={src}
                                                         alt={`Image Preview ${index + 1}`}
-                                                        width={128}
-                                                        height={128}
+                                                        width={90}
+                                                        height={120}
                                                         className="rounded-lg object-cover"
                                                     />
                                                 </div>
@@ -433,9 +368,7 @@ export default function AddItem() {
                         )}
                     />
 
-                    <Button type="submit" className="w-full mt-4">
-                        Add Item
-                    </Button>
+                    <Button type="submit">Add Item</Button>
                 </form>
             </Form>
         </div>

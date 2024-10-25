@@ -14,7 +14,7 @@ import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
 // Shadcn Imports
-import { Sidebar, SidebarHeader, SidebarSeparator, SidebarFooter, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarRail } from "@/components/ui/sidebar"
+import { Sidebar, SidebarHeader, SidebarFooter, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarRail } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
 
 export default function SidebarApp() {
