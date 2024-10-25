@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 // Form Imports
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, Controller } from "react-hook-form"
+import { useForm } from "react-hook-form"
 
 // Shadcn Imports
 import { Input } from "@/components/ui/input"
@@ -34,8 +34,14 @@ import { v4 as uuidv4 } from "uuid"
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
     brand: z.string().min(1, "Brand is required"),
-    category: z.string().min(1, "Category is required"),
-    size: z.string().min(1, "Size is required"),
+    category: z.object({
+        group: z.string().min(1, "Category group is required"),
+        value: z.string().min(1, "Category value is required"),
+    }),
+    size: z.object({
+        group: z.string().min(1, "Size group is required"),
+        value: z.string().min(1, "Size value is required"),
+    }),
     color: z.string().min(1, "Color is required"),
     condition: z.string().min(1, "Condition is required"),
     purchaseCost: z.coerce.number().min(0, "Cost must be positive"),
@@ -44,6 +50,87 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+// Define grouped categories
+const categories = [
+    { group: "Tops", items: ["Cardigans", "Coats", "Hoodies", "Jackets", "Overshirts", "Shirts", "Sweaters", "Sweatshirts", "Tank Tops", "Vests"] },
+    { group: "Bottoms", items: ["Leggings", "Pants", "Shorts", "Swim"] },
+    { group: "Accessories", items: ["Bags", "Hats", "Jewelry", "Scarfs", "Shoes", "Sunglasses"] },
+    { group: "Other", items: ["Onesies", "Overalls"] },
+];
+
+const sizeGroups = [
+    {
+        group: "General Sizes",
+        items: [
+            { label: "XS", value: "general_xs" },
+            { label: "S", value: "general_s" },
+            { label: "M", value: "general_m" },
+            { label: "L", value: "general_l" },
+            { label: "XL", value: "general_xl" },
+            { label: "OS (One Size)", value: "general_os" },
+        ],
+    },
+    {
+        group: "Numeric General Sizes",
+        items: [
+            { label: "0", value: "num_general_0" },
+            { label: "2", value: "num_general_2" },
+            { label: "4", value: "num_general_4" },
+            { label: "6", value: "num_general_6" },
+            { label: "8", value: "num_general_8" },
+            { label: "10", value: "num_general_10" },
+            { label: "12", value: "num_general_12" },
+            { label: "14", value: "num_general_14" },
+            { label: "16", value: "num_general_16" },
+            { label: "18", value: "num_general_18" },
+        ],
+    },
+    {
+        group: "Pant Sizes (Waist x Inseam)",
+        items: [
+            { label: "28x30", value: "pant_28x30" },
+            { label: "28x32", value: "pant_28x32" },
+            { label: "30x30", value: "pant_30x30" },
+            { label: "30x32", value: "pant_30x32" },
+            { label: "32x30", value: "pant_32x30" },
+            { label: "32x32", value: "pant_32x32" },
+            { label: "34x30", value: "pant_34x30" },
+            { label: "34x32", value: "pant_34x32" },
+            { label: "36x30", value: "pant_36x30" },
+            { label: "36x32", value: "pant_36x32" },
+            { label: "38x30", value: "pant_38x30" },
+            { label: "38x32", value: "pant_38x32" },
+        ],
+    },
+    {
+        group: "Men’s Shoe Sizes",
+        items: [
+            { label: "6", value: "mens_shoe_6" },
+            { label: "7", value: "mens_shoe_7" },
+            { label: "8", value: "mens_shoe_8" },
+            { label: "9", value: "mens_shoe_9" },
+            { label: "10", value: "mens_shoe_10" },
+            { label: "11", value: "mens_shoe_11" },
+            { label: "12", value: "mens_shoe_12" },
+            { label: "13", value: "mens_shoe_13" },
+        ],
+    },
+    {
+        group: "Women’s Shoe Sizes",
+        items: [
+            { label: "5", value: "womens_shoe_5" },
+            { label: "6", value: "womens_shoe_6" },
+            { label: "7", value: "womens_shoe_7" },
+            { label: "8", value: "womens_shoe_8" },
+            { label: "9", value: "womens_shoe_9" },
+            { label: "10", value: "womens_shoe_10" },
+            { label: "11", value: "womens_shoe_11" },
+        ],
+    },
+];
+
+
 
 export default function AddItem() {
     const router = useRouter();
@@ -54,8 +141,8 @@ export default function AddItem() {
         defaultValues: {
             name: "",
             brand: "",
-            category: "",
-            size: "",
+            category: { group: "", value: "" },
+            size: { group: "", value: "" },
             color: "",
             condition: "",
             purchaseCost: 0,
@@ -84,8 +171,10 @@ export default function AddItem() {
             const docRef = await addDoc(collection(db, "closet"), {
                 id: itemId,
                 ...values,
-                images: imageUrls,
+                category: values.category,
+                size: values.size,
                 purchaseDate: values.purchaseDate.toISOString(),
+                images: imageUrls,
             });
 
             console.log("Document written with ID: ", docRef.id);
@@ -139,52 +228,26 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Category</FormLabel>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue="">
+                                    <Select
+                                        onValueChange={(value) => {
+                                            // Find the group name for the selected value
+                                            const selectedGroup = categories.find(group => group.items.includes(value))?.group;
+                                            field.onChange({ group: selectedGroup, value }); // Store both group and value
+                                        }}
+                                        defaultValue={field.value?.value || ""}
+                                    >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select a category" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {/* Tops Group */}
-                                            <SelectGroup>
-                                                <SelectLabel>Tops</SelectLabel>
-                                                <SelectItem value="tank_tops">Tank Tops</SelectItem>
-                                                <SelectItem value="shirts">Shirts</SelectItem>
-                                                <SelectItem value="hoodies">Hoodies</SelectItem>
-                                                <SelectItem value="cardigans">Cardigans</SelectItem>
-                                                <SelectItem value="vests">Vests</SelectItem>
-                                                <SelectItem value="sweaters">Sweaters</SelectItem>
-                                                <SelectItem value="jackets">Jackets</SelectItem>
-                                                <SelectItem value="coats">Coats</SelectItem>
-                                                <SelectItem value="overshirts">Overshirts</SelectItem>
-                                                <SelectItem value="sweatshirts">Sweatshirts</SelectItem>
-                                            </SelectGroup>
-
-                                            {/* Bottoms Group */}
-                                            <SelectGroup>
-                                                <SelectLabel>Bottoms</SelectLabel>
-                                                <SelectItem value="pants">Pants</SelectItem>
-                                                <SelectItem value="shorts">Shorts</SelectItem>
-                                                <SelectItem value="swim">Swim</SelectItem>
-                                                <SelectItem value="leggings">Leggings</SelectItem>
-                                            </SelectGroup>
-
-                                            {/* Accessories Group */}
-                                            <SelectGroup>
-                                                <SelectLabel>Accessories</SelectLabel>
-                                                <SelectItem value="hats">Hats</SelectItem>
-                                                <SelectItem value="sunglasses">Sunglasses</SelectItem>
-                                                <SelectItem value="bags">Bags</SelectItem>
-                                                <SelectItem value="jewelry">Jewelry</SelectItem>
-                                                <SelectItem value="scarfs">Scarfs</SelectItem>
-                                                <SelectItem value="shoes">Shoes</SelectItem>
-                                            </SelectGroup>
-
-                                            {/* Other Group */}
-                                            <SelectGroup>
-                                                <SelectLabel>Other</SelectLabel>
-                                                <SelectItem value="overalls">Overalls</SelectItem>
-                                                <SelectItem value="onesies">Onesies</SelectItem>
-                                            </SelectGroup>
+                                            {categories.map(({ group, items }) => (
+                                                <SelectGroup key={group}>
+                                                    <SelectLabel>{group}</SelectLabel>
+                                                    {items.map(item => (
+                                                        <SelectItem key={item} value={item.toLowerCase()}>{item}</SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </FormControl>
@@ -201,14 +264,29 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Size</FormLabel>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <Select
+                                        onValueChange={(value) => {
+                                            const selectedGroup = sizeGroups.find(group =>
+                                                group.items.some(item => item.value === value)
+                                            )?.group;
+                                            field.onChange({ group: selectedGroup || "", value }); // Store as an object with group and value
+                                        }}
+                                        defaultValue={field.value?.value || ""}
+                                    >
                                         <SelectTrigger>
-                                            {field.value || "Select Size"}
+                                            <SelectValue placeholder="Select Size" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="small">Small</SelectItem>
-                                            <SelectItem value="medium">Medium</SelectItem>
-                                            <SelectItem value="large">Large</SelectItem>
+                                            {sizeGroups.map(({ group, items }) => (
+                                                <SelectGroup key={group}>
+                                                    <SelectLabel>{group}</SelectLabel>
+                                                    {items.map(item => (
+                                                        <SelectItem key={item.value} value={item.value}>
+                                                            {item.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectGroup>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                 </FormControl>
@@ -225,17 +303,11 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Color</FormLabel>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <SelectTrigger>
-                                            {field.value || "Select Color"}
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="red">Red</SelectItem>
-                                            <SelectItem value="blue">Blue</SelectItem>
-                                            <SelectItem value="black">Black</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <Input {...field} placeholder="Enter color" />
                                 </FormControl>
+                                <FormDescription>
+                                    Specify the color (e.g., "Olive Green," "Coral").
+                                </FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -272,7 +344,7 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Purchase Cost</FormLabel>
                                 <FormControl>
-                                    <Input {...field} placeholder="$0.00" type="number" />
+                                    <Input {...field} type="number" placeholder="$0.00" min="0" step="0.01" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -345,7 +417,7 @@ export default function AddItem() {
                                             type="file"
                                             accept="image/*"
                                             multiple
-                                            onChange={(e) => {
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                 const files = Array.from(e.target.files || []);
                                                 field.onChange(files);
                                                 setImagePreviews(files.map((file) => URL.createObjectURL(file)));
