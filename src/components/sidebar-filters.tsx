@@ -11,9 +11,9 @@ import { Check, ChevronRight } from "lucide-react"
 
 
 const filterData = [
-    { name: "Type", items: ["Personal", "Work", "Family"] },
-    { name: "Status", items: ["Upcoming", "Completed"] },
-    { name: "Category", items: ["Travel", "Reminders", "Deadlines"] },
+    { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
+    { name: "Sort", items: ["Newest", "Oldest", "Most Expensive", "Least Expensive"] },
+    { name: "Brand", items: ["Brand A", "Brand B", "Brand C"] },
 ];
 
 export default function SidebarFilters() {

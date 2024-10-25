@@ -1,12 +1,12 @@
 "use client"
 
-// React Imports
+// Next and React Imports
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 // App Imports
 import SidebarNav from "@/components/sidebar-nav"
 import SidebarFilters from "@/components/sidebar-filters"
-import SidebarDatePicker from "@/components/sidebar-datepicker"
 import { User } from "@/lib/types"
 
 // Firebase Imports
@@ -44,9 +44,7 @@ export default function SidebarApp() {
                 {user ? <SidebarNav user={user} /> : <p>Loading...</p>}
             </SidebarHeader>
 
-            <SidebarContent>
-                <SidebarDatePicker />
-                <SidebarSeparator className="mx-0" />
+            <SidebarContent className="pt-2">
                 <SidebarFilters />
             </SidebarContent>
 
@@ -54,10 +52,12 @@ export default function SidebarApp() {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton>
-                            <Plus />
-                            <span>Add Clothing Item</span>
-                        </SidebarMenuButton>
+                        <Link href="/add-item" passHref>
+                            <SidebarMenuButton>
+                                <Plus />
+                                <span>Add Clothing Item</span>
+                            </SidebarMenuButton>
+                        </Link>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
