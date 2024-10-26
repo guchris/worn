@@ -17,7 +17,15 @@ const filterData = [
 ];
 
 export default function SidebarFilters() {
-    const [activeItems, setActiveItems] = useState<Record<string, boolean>>({});
+
+    const defaultActiveItems = filterData.reduce((acc, filter) => {
+        filter.items.forEach((item) => {
+            acc[`${filter.name}-${item}`] = true;
+        });
+        return acc;
+    }, {} as Record<string, boolean>);
+
+    const [activeItems, setActiveItems] = useState<Record<string, boolean>>(defaultActiveItems);
 
     const toggleItem = (filterName: string, item: string) => {
         setActiveItems((prev) => ({
