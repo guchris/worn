@@ -53,7 +53,7 @@ export default function AuthLogin() {
                     </div>
                     <div className="mt-4 text-center text-sm">
                         Don&apos;t have an account?{" "}
-                        <Link href="#" className="underline">
+                        <Link href="/auth/sign-up" className="underline">
                             Sign up
                         </Link>
                     </div>

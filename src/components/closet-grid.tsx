@@ -19,10 +19,12 @@ const ClosetGrid = ({ items, loading }: ClosetGridProps) => {
             {loading ? (
                 Array.from({ length: 20 }).map((_, index) => (
                     <div key={index} className="flex flex-col space-y-3">
-                        <Skeleton className="w-full h-[350px] rounded-xl" />
+                        <div className="w-full aspect-[3/4] sm:aspect-[3/4] md:aspect-[3/4] lg:aspect-[3/4]">
+                            <Skeleton className="w-full h-full rounded-xl" />
+                        </div>
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/4" />
                         </div>
                     </div>
                 ))

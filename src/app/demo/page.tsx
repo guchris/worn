@@ -80,7 +80,7 @@ export default function Demo() {
 
                 {/* Nav Header */}
                 <SidebarHeader className="h-16 border-b border-sidebar-border">
-                    {user ? <SidebarNav user={user} /> : <p>Loading...</p>}
+                    <SidebarNav user={user} />
                 </SidebarHeader>
 
                 <SidebarContent className="pt-2">
@@ -112,7 +112,7 @@ export default function Demo() {
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbPage>My Closet</BreadcrumbPage>
+                                <BreadcrumbPage>Demo Closet</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>

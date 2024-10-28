@@ -1,26 +1,28 @@
 // Next Imports
 import Link from "next/link"
 
-// Shadcn Imports
-import { Button } from "@/components/ui/button"
-
 export default function Home() {
 	return (
-		<div className="flex min-h-screen items-center justify-center">
-            <div className="text-center space-y-6">
-                {/* Title */}
-                <h1 className="text-4xl font-bold">worn</h1>
+		<div className="relative flex min-h-screen items-center justify-center overflow-hidden">
+			<div className="flex space-x-4">
+				<div className="flex flex-col items-start text-xl font-bold">
+					{Array.from({ length: 24 }).map((_, index) => (
+						<span key={index} className="leading-none">
+							W O R N
+						</span>
+					))}
+				</div>
 
-                {/* Buttons Row */}
-                <div className="flex justify-center space-x-4">
-					<Link href="/demo" passHref>
-						<Button variant="outline">view demo closet</Button>
+				<div className="flex flex-col items-start justify-center text-xl font-bold">
+					<Link href="/auth/login" className="leading-none hover:underline">
+						L O G I N
 					</Link>
-					<Link href="/auth/login" passHref>
-						<Button variant="default">login</Button>
+					<Link href="/demo" className="leading-none hover:underline">
+						D E M O
 					</Link>
-                </div>
-            </div>
-        </div>
+				</div>
+
+			</div>
+		</div>
 	)
 }
