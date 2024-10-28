@@ -2,30 +2,59 @@
 
 // React Imports
 import * as React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+
+// App Imports
+import { fetchUniqueBrands } from "@/lib/firebaseFunctions"
 
 // Shadcn Imports
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarSeparator } from "@/components/ui/sidebar"
 import { Check, ChevronRight } from "lucide-react"
 
+interface SidebarFiltersProps {
+    userId: string;
+}
 
-const filterData = [
-    { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
-    { name: "Sort", items: ["Newest", "Oldest", "Most Expensive", "Least Expensive"] },
-    { name: "Brand", items: ["Brand A", "Brand B", "Brand C"] },
-];
+interface FilterItem {
+    name: string;
+    items: string[];
+}
 
-export default function SidebarFilters() {
+export default function SidebarFilters({ userId }: SidebarFiltersProps) {
+    
+    const [filterData, setFilterData] = useState<FilterItem[]>([
+        { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
+        { name: "Brand", items: [] },
+    ]);
 
-    const defaultActiveItems = filterData.reduce((acc, filter) => {
-        filter.items.forEach((item) => {
-            acc[`${filter.name}-${item}`] = true;
-        });
-        return acc;
-    }, {} as Record<string, boolean>);
+    const [activeItems, setActiveItems] = useState<Record<string, boolean>>({});
 
-    const [activeItems, setActiveItems] = useState<Record<string, boolean>>(defaultActiveItems);
+    // Fetch unique brands and update the "Brand" filter section
+    useEffect(() => {
+        const loadBrands = async () => {
+            const brands = await fetchUniqueBrands(userId);
+            setFilterData((prev) =>
+                prev.map((filter) =>
+                    filter.name === "Brand" ? { ...filter, items: brands } : filter
+                )
+            );
+        };
+        
+        loadBrands();
+    }, [userId]);
+
+    // Initialize active items state on load
+    useEffect(() => {
+        const defaultActiveItems = filterData.reduce((acc, filter) => {
+            filter.items.forEach((item) => {
+                acc[`${filter.name}-${item}`] = true;
+            });
+            return acc;
+        }, {} as Record<string, boolean>);
+
+        setActiveItems(defaultActiveItems);
+    }, [filterData]);
 
     const toggleItem = (filterName: string, item: string) => {
         setActiveItems((prev) => ({
@@ -39,7 +68,7 @@ export default function SidebarFilters() {
             {filterData.map((filter, index) => (
                 <React.Fragment key={filter.name}>
                     <SidebarGroup key={filter.name} className="py-0">
-                        <Collapsible defaultOpen={index === 0} className="group/collapsible">
+                        <Collapsible defaultOpen={true} className="group/collapsible">
                             <SidebarGroupLabel asChild className="group/label w-full text-sm text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                                 <CollapsibleTrigger>
                                     {filter.name}

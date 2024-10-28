@@ -21,12 +21,15 @@ const DEMO_USER_ID = process.env.NEXT_PUBLIC_DEMO_USER_ID!;
 export default function Demo() {
     const [closetItems, setClosetItems] = useState<Item[]>([]);
     const [filters, setFilters] = useState<Record<string, any>>({});
+    const [loading, setLoading] = useState(true);
 
     // Fetch closet items on load and when filters update
     useEffect(() => {
         const fetchItems = async () => {
-            const items = await fetchClosetItems(DEMO_USER_ID, filters);
+            setLoading(true);
+            const items = await fetchClosetItems(DEMO_USER_ID);
             setClosetItems(items);
+            setLoading(false);
         };
         fetchItems();
     }, [filters]);
@@ -55,7 +58,7 @@ export default function Demo() {
 						</Breadcrumb>
 					</header>
 					<div className="flex flex-1 flex-col gap-4 p-4">
-                        <ClosetGrid items={closetItems} />
+                        <ClosetGrid items={closetItems} loading={loading} />
 					</div>
 				</SidebarInset>
 			</SidebarProvider>

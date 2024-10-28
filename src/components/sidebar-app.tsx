@@ -8,32 +8,24 @@ import { useEffect, useState } from "react"
 import SidebarNav from "@/components/sidebar-nav"
 import SidebarFilters from "@/components/sidebar-filters"
 import { User } from "@/lib/types"
-
-// Firebase Imports
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "@/lib/firebase"
+import { fetchUserData } from "@/lib/firebaseFunctions"
 
 // Shadcn Imports
 import { Sidebar, SidebarHeader, SidebarFooter, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarRail } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
 
+const DEMO_USER_ID = process.env.NEXT_PUBLIC_DEMO_USER_ID!;
+
 export default function SidebarApp() {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-
-        const fetchUserData = async () => {
-            const userDoc = doc(db, "users", "vhDFojFLrNIjkqo0vCmI"); 
-            const docSnapshot = await getDoc(userDoc);
-
-            if (docSnapshot.exists()) {
-                setUser(docSnapshot.data() as User);
-            } else {
-                console.log("No such document!");
-            }
+        const getUserData = async () => {
+            const fetchedUser = await fetchUserData(DEMO_USER_ID);
+            setUser(fetchedUser);
         };
 
-        fetchUserData();
+        getUserData();
     }, []);
 
     return (
@@ -45,7 +37,7 @@ export default function SidebarApp() {
             </SidebarHeader>
 
             <SidebarContent className="pt-2">
-                <SidebarFilters />
+                <SidebarFilters userId={DEMO_USER_ID}/>
             </SidebarContent>
 
             {/* Footer Actions */}
