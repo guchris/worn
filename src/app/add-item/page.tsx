@@ -134,7 +134,7 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} placeholder="Clothing Item Name" />
+                                    <Input {...field} placeholder="Item Name" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -232,7 +232,7 @@ export default function AddItem() {
                             <FormItem>
                                 <FormLabel>Color</FormLabel>
                                 <FormControl>
-                                    <Input {...field} placeholder="Enter color" />
+                                    <Input {...field} placeholder="Item color" />
                                 </FormControl>
                                 <FormDescription>
                                     Specify the color (e.g., "Olive Green," "Coral").

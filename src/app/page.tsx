@@ -1,36 +1,22 @@
-// App Imports
-import SidebarApp from "@/components/sidebar-app"
-import ClosetGrid from "@/components/closet-grid"
+// Next Imports
+import Link from "next/link"
 
 // Shadcn Imports
-import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
 	return (
-		<div>
-			<SidebarProvider>
+		<div className="flex min-h-screen items-center justify-center bg-gray-50">
+            <div className="text-center space-y-6">
+                {/* Title */}
+                <h1 className="text-4xl font-bold text-gray-800">worn</h1>
 
-				<SidebarApp />
-
-				<SidebarInset>
-					<header className="sticky top-0 flex h-16 items-center gap-2 border-b bg-background px-4">
-						<SidebarTrigger className="-ml-1" />
-						<Separator orientation="vertical" className="mr-2 h-4" />
-						<Breadcrumb>
-							<BreadcrumbList>
-								<BreadcrumbItem>
-									<BreadcrumbPage>My Closet</BreadcrumbPage>
-								</BreadcrumbItem>
-							</BreadcrumbList>
-						</Breadcrumb>
-					</header>
-					<div className="flex flex-1 flex-col gap-4 p-4">
-						<ClosetGrid />
-					</div>
-				</SidebarInset>
-			</SidebarProvider>
-		</div>
+                {/* Buttons Row */}
+                <div className="flex justify-center space-x-4">
+                    <Button variant="outline">view example closet</Button>
+                    <Button variant="default">login</Button>
+                </div>
+            </div>
+        </div>
 	)
 }
