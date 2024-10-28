@@ -6,15 +6,19 @@ import { Button } from "@/components/ui/button"
 
 export default function Home() {
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-gray-50">
+		<div className="flex min-h-screen items-center justify-center">
             <div className="text-center space-y-6">
                 {/* Title */}
-                <h1 className="text-4xl font-bold text-gray-800">worn</h1>
+                <h1 className="text-4xl font-bold">worn</h1>
 
                 {/* Buttons Row */}
                 <div className="flex justify-center space-x-4">
-                    <Button variant="outline">view example closet</Button>
-                    <Button variant="default">login</Button>
+					<Link href="/demo" passHref>
+						<Button variant="outline">view demo closet</Button>
+					</Link>
+					<Link href="/auth/login" passHref>
+						<Button variant="default">login</Button>
+					</Link>
                 </div>
             </div>
         </div>
