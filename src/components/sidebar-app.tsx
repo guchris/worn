@@ -37,7 +37,7 @@ export default function SidebarApp() {
             </SidebarHeader>
 
             <SidebarContent className="pt-2">
-                <SidebarFilters userId={DEMO_USER_ID}/>
+                {/* <SidebarFilters userId={DEMO_USER_ID}/> */}
             </SidebarContent>
 
             {/* Footer Actions */}

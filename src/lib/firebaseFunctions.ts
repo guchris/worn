@@ -35,17 +35,20 @@ export async function fetchUserData(userId: string): Promise<User | null> {
  * @param filters - An optional object containing key-value pairs to filter the items.
  * @returns A promise that resolves to an array of Item objects.
  */
-export async function fetchClosetItems(userId: string, filters: Record<string, any> = {}): Promise<Item[]> {
+export async function fetchClosetItems(userId: string, filters: Record<string, string[]> = {}): Promise<Item[]> {
     try {
         const closetRef = collection(db, `users/${userId}/closet`);
         let closetQuery = query(closetRef);
 
-        // Apply filters dynamically if any are provided
-        Object.keys(filters).forEach((key) => {
-            if (filters[key]) {
-                closetQuery = query(closetQuery, where(key, "==", filters[key]));
-            }
-        });
+        if (filters.Categories && filters.Categories.length > 0) {
+            const lowercaseCategories = filters.Categories.map(category => category.toLowerCase());
+            closetQuery = query(closetQuery, where("categoryGroup", "in", lowercaseCategories));
+        }
+
+        // Apply brand filter if brands are selected
+        if (filters.Brand && filters.Brand.length > 0) {
+            closetQuery = query(closetQuery, where("brand", "in", filters.Brand));
+        }
 
         const querySnapshot = await getDocs(closetQuery);
         const items = querySnapshot.docs.map((doc) => {

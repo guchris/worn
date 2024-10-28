@@ -14,6 +14,7 @@ import { Check, ChevronRight } from "lucide-react"
 
 interface SidebarFiltersProps {
     userId: string;
+    onFiltersChange: (filters: Record<string, string[]>) => void;
 }
 
 interface FilterItem {
@@ -21,7 +22,7 @@ interface FilterItem {
     items: string[];
 }
 
-export default function SidebarFilters({ userId }: SidebarFiltersProps) {
+export default function SidebarFilters({ userId, onFiltersChange }: SidebarFiltersProps) {
     
     const [filterData, setFilterData] = useState<FilterItem[]>([
         { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
@@ -55,6 +56,17 @@ export default function SidebarFilters({ userId }: SidebarFiltersProps) {
 
         setActiveItems(defaultActiveItems);
     }, [filterData]);
+
+    // Apply filter updates after activeItems state changes
+    useEffect(() => {
+        const activeFilters: Record<string, string[]> = filterData.reduce((acc, filter) => {
+            acc[filter.name] = filter.items.filter((item) => activeItems[`${filter.name}-${item}`]);
+            return acc;
+        }, {} as Record<string, string[]>);
+
+        // Notify parent component
+        onFiltersChange(activeFilters);
+    }, [activeItems]);
 
     const toggleItem = (filterName: string, item: string) => {
         setActiveItems((prev) => ({
