@@ -1,7 +1,6 @@
 "use client"
 
 // Next and React Imports
-import Link from "next/link"
 import { useState, useEffect } from "react"
 
 // App Imports
@@ -16,25 +15,8 @@ import { fetchUserData, fetchClosetItems } from "@/lib/firebaseFunctions"
 // Shadcn Imports
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarInset,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarProvider,
-    SidebarRail,
-    SidebarSeparator,
-    SidebarTrigger,
-    useSidebar,
-} from "@/components/ui/sidebar"
-import { Plus } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarHeader, SidebarInset, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/ui/sidebar"
+
 
 const DEMO_USER_ID = process.env.NEXT_PUBLIC_DEMO_USER_ID!;
 
