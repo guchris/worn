@@ -15,7 +15,7 @@ interface ClosetGridProps {
 
 const ClosetGrid = ({ items, loading }: ClosetGridProps) => {
     return (
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {loading ? (
                 Array.from({ length: 20 }).map((_, index) => (
                     <div key={index} className="flex flex-col space-y-3">

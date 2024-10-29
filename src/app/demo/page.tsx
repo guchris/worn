@@ -88,7 +88,7 @@ export default function Demo() {
                 </SidebarContent>
 
                 {/* Footer Actions */}
-                <SidebarFooter>
+                {/* <SidebarFooter>
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <Link href="/add-item" passHref>
@@ -99,7 +99,7 @@ export default function Demo() {
                             </Link>
                         </SidebarMenuItem>
                     </SidebarMenu>
-                </SidebarFooter>
+                </SidebarFooter> */}
 
                 {/* Optional SidebarRail for smaller screens */}
                 <SidebarRail />
