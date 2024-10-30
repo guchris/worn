@@ -17,7 +17,7 @@ interface ImageItem {
 
 export default function ImagePlayground() {
 
-    // Generate images with random gray shades
+    // Initial state with images, setting their positions and zIndex
     const initialImages = [
         { id: 1, x: 50, y: 50, zIndex: 1, src: "/playground/item1.png" },
         { id: 2, x: 50, y: 150, zIndex: 2, src: "/playground/item2.png" },
@@ -29,7 +29,9 @@ export default function ImagePlayground() {
     const [images, setImages] = useState<ImageItem[]>(initialImages);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [touchOffset, setTouchOffset] = useState({ offsetX: 0, offsetY: 0 });
 
+    // Increases the zIndex of the selected image, bringing it to the front
     const bringToFront = (id: number) => {
         setImages((prevImages) => {
             const targetImage = prevImages.find((img) => img.id === id);
@@ -48,6 +50,7 @@ export default function ImagePlayground() {
         });
     };
 
+    // Decreases the zIndex of the selected image, sending it to the back
     const sendToBack = (id: number) => {
         setImages((prevImages) => {
             const targetImage = prevImages.find((img) => img.id === id);
@@ -66,16 +69,42 @@ export default function ImagePlayground() {
         });
     };
 
+    // Handles mouse click on an image, selects it, and initiates dragging
     const handleMouseDown = (id: number, event: React.MouseEvent) => {
         event.stopPropagation();
         setSelectedImageId(id);
         setIsDragging(true);
     };
 
+    // Handles touch start on an image, selects it, and initiates dragging (for mobile)
+    const handleTouchStart = (id: number, event: React.TouchEvent) => {
+        event.stopPropagation();
+        event.preventDefault();
+        setSelectedImageId(id);
+        setIsDragging(true);
+
+        // Calculate the offset between the touch point and the image’s position
+        const touch = event.touches[0];
+        const image = images.find(img => img.id === id);
+        if (image) {
+            setTouchOffset({
+                offsetX: touch.clientX - image.x,
+                offsetY: touch.clientY - image.y
+            });
+        }
+    };
+
+    // Stops dragging on mouse release
     const handleMouseUp = () => {
         setIsDragging(false);
     };
 
+    // Stops dragging on touch release (for mobile)
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+    };
+
+    // Updates the position of the selected image based on mouse movement while dragging
     const handleMouseMove = (event: React.MouseEvent) => {
         if (isDragging && selectedImageId !== null) {
             const { movementX, movementY } = event;
@@ -89,6 +118,25 @@ export default function ImagePlayground() {
         }
     };
 
+    // Updates the position of the selected image based on touch movement while dragging (for mobile)
+    const handleTouchMove = (event: React.TouchEvent) => {
+        if (isDragging && selectedImageId !== null) {
+            event.preventDefault();
+            const touch = event.touches[0];
+            setImages(prevImages =>
+                prevImages.map(img =>
+                    img.id === selectedImageId
+                        ? { 
+                            ...img, 
+                            x: touch.clientX - touchOffset.offsetX, 
+                            y: touch.clientY - touchOffset.offsetY 
+                          }
+                        : img
+                )
+            );
+        }
+    };
+
     return (
         <div className="p-4">
             <div
@@ -96,12 +144,16 @@ export default function ImagePlayground() {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
                 onMouseDown={() => setSelectedImageId(null)}
+                onTouchStart={() => setSelectedImageId(null)}
             >
                 {images.map((image) => (
                     <div
                         key={image.id}
                         onMouseDown={(e) => handleMouseDown(image.id, e)}
+                        onTouchStart={(e) => handleTouchStart(image.id, e)}
                         style={{
                             position: "absolute",
                             top: image.y,
