@@ -1,7 +1,8 @@
 "use client"
 
-// React Imports
+// Next and React Imports
 import { useState } from "react"
+import Image from "next/image"
 
 // Other Imports
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
@@ -11,19 +12,19 @@ interface ImageItem {
     x: number;
     y: number;
     zIndex: number;
-    color: string;
+    src: string;
 }
 
 export default function ImagePlayground() {
 
     // Generate images with random gray shades
-    const initialImages = Array.from({ length: 6 }).map((_, index) => ({
-        id: index + 1,
-        x: 50 + index * 100,
-        y: 50 + index * 50,
-        zIndex: index + 1,
-        color: `hsl(0, 0%, ${50 + index * 10}%)`,
-    }));
+    const initialImages = [
+        { id: 1, x: 50, y: 50, zIndex: 1, src: "/playground/item1.png" },
+        { id: 2, x: 50, y: 150, zIndex: 2, src: "/playground/item2.png" },
+        { id: 3, x: 50, y: 250, zIndex: 3, src: "/playground/item3.png" },
+        { id: 4, x: 50, y: 350, zIndex: 4, src: "/playground/item4.png" },
+        { id: 5, x: 50, y: 450, zIndex: 5, src: "/playground/item5.png" },
+    ];
 
     const [images, setImages] = useState<ImageItem[]>(initialImages);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
@@ -65,7 +66,8 @@ export default function ImagePlayground() {
         });
     };
 
-    const handleMouseDown = (id: number) => {
+    const handleMouseDown = (id: number, event: React.MouseEvent) => {
+        event.stopPropagation();
         setSelectedImageId(id);
         setIsDragging(true);
     };
@@ -94,25 +96,34 @@ export default function ImagePlayground() {
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
+                onMouseDown={() => setSelectedImageId(null)}
             >
                 {images.map((image) => (
                     <div
                         key={image.id}
-                        onMouseDown={() => handleMouseDown(image.id)}
+                        onMouseDown={(e) => handleMouseDown(image.id, e)}
                         style={{
                             position: "absolute",
                             top: image.y,
                             left: image.x,
                             zIndex: image.zIndex,
-                            width: "100px",
-                            height: "150px",
-                            backgroundColor: image.color,
+                            width: "90px",
+                            height: "120px",
                             cursor: "move",
+                            border: selectedImageId === image.id ? "1px solid lightgray" : "none",
                         }}
-                        className="rounded shadow-md"
+                        className="rounded"
                     >
+                        <Image
+                            src={image.src}
+                            alt={`Image ${image.id}`}
+                            width={90}
+                            height={120}
+                            className="object-cover rounded"
+                            draggable="false"
+                        />
                         {selectedImageId === image.id && (
-                            <div className="absolute top-0 right-0 flex space-x-1 p-1">
+                            <div className="absolute top-0 right-0 flex flex-col space-y-1 p-1">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
