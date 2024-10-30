@@ -138,9 +138,9 @@ export default function ImagePlayground() {
     };
 
     return (
-        <div className="p-4">
+        <div className="p-4 w-full h-[calc(100vh-4rem)] overflow-hidden">
             <div
-                className="relative w-full h-[800px] border rounded-lg overflow-hidden"
+                className="relative w-full h-full border rounded-lg"
                 style={{ touchAction: "none" }}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
