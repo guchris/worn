@@ -1,8 +1,9 @@
 "use client"
 
 // Next and React Imports
-import { useState } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 // Other Imports
 import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
@@ -18,9 +19,8 @@ interface DraggableItem {
 }
 
 export default function DemoPlayground() {
-    
-
-    const MIN_DISTANCE = 100; // Minimum pixel distance between items
+    const router = useRouter();
+    const MIN_DISTANCE = 100;
 
     // Function to generate random positions ensuring minimum distance
     function generateRandomPosition(existingItems: DraggableItem[]): { x: number; y: number } {
@@ -43,20 +43,29 @@ export default function DemoPlayground() {
         return { x, y };
     }
 
-    // Initial state with text items and randomly placed images
-    const initialItems: DraggableItem[] = [
-        // Text items
-        { id: 6, x: 20, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 6, type: "text", content: "worn" },
-        { id: 7, x: 20, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 7, type: "text", content: "fashion for you" },
-    ];
+    const [items, setItems] = useState<DraggableItem[]>([]);
 
-    // Generate image items with random positions
-    for (let i = 1; i <= 5; i++) {
-        const { x, y } = generateRandomPosition(initialItems);
-        initialItems.push({ id: i, x, y, zIndex: i, type: "image", src: `/playground/item${i}.png` });
-    }
+    // Set initial items after component mounts
+    useEffect(() => {
+        const initialItems: DraggableItem[] = [
+            // Left-aligned text items positioned conditionally for mobile and desktop
+            { id: 11, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn" },
+            { id: 12, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you" },
+            
+            // Right-aligned text items positioned conditionally for mobile and desktop
+            { id: 13, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login" },
+            { id: 14, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 14, type: "text", content: "join" },
+        ];
 
-    const [items, setItems] = useState<DraggableItem[]>(initialItems);
+        // Generate random positions for image items without overlap
+        for (let i = 1; i <= 10; i++) {
+            const { x, y } = generateRandomPosition(initialItems);
+            initialItems.push({ id: i, x, y, zIndex: i, type: "image", src: `/playground/item${i}.png` });
+        }
+
+        setItems(initialItems);
+    }, []);
+
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [touchOffset, setTouchOffset] = useState({ offsetX: 0, offsetY: 0 });
@@ -188,19 +197,24 @@ export default function DemoPlayground() {
                             cursor: "move",
                             border: selectedItemId === item.id ? "1px solid lightgray" : "none",
                         }}
+                        onClick={() => {
+                            if (item.content === "login") router.push("/auth/login");
+                            else if (item.content === "join") router.push("/auth/sign-up");
+                        }}
                     >
                         {item.type === "image" && item.src && (
                             <Image
                                 src={item.src}
                                 alt={`Image ${item.id}`}
-                                width={90}
-                                height={120}
+                                width={window.innerWidth >= 768 ? 135 : 90}
+                                height={window.innerWidth >= 768 ? 180 : 120}
                                 className="object-cover rounded"
                                 draggable="false"
                             />
                         )}
                         {item.type === "text" && item.content && (
-                            <p className={item.content === "worn" ? "text-sm font-semibold" : "text-sm"}>
+                            <p className={`text-sm ${item.content === "worn" ? "font-semibold" : ""} 
+                                ${["login", "join"].includes(item.content) ? "hover:underline" : ""} ${["login", "sign up"].includes(item.content) ? "text-right" : ""}`}>
                                 {item.content}
                             </p>
                         )}

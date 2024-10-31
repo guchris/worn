@@ -10,42 +10,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function AuthSignup() {
     return (
         <div className="flex h-screen w-full items-center justify-center px-4">
-            <Card className="mx-auto max-w-sm">
+            <Card className="mx-auto max-w-sm shadow-none">
                 <CardHeader>
-                    <CardTitle className="text-2xl">Sign Up</CardTitle>
+                    <CardTitle className="text-2xl">sign up</CardTitle>
                     <CardDescription>
-                        Enter your details below to create a new account.
+                        enter your details below to create a new account
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form action="/auth/signup" method="post" className="grid gap-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">name</Label>
                             <Input id="name" name="name" type="text" placeholder="John Doe" required />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username">username</Label>
                             <Input id="username" name="username" type="text" placeholder="john_doe" required />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email">email</Label>
                             <Input id="email" name="email" type="email" placeholder="m@example.com" required />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">password</Label>
                             <Input id="password" name="password" type="password" required />
                         </div>
                         <Button type="submit" className="w-full">
-                            Sign Up
+                            sign up
                         </Button>
                         <Button variant="outline" className="w-full">
-                            Signup with Google
+                            signup with google
                         </Button>
                     </form>
                     <div className="mt-4 text-center text-sm">
-                        Already have an account?{" "}
+                        already have an account?{" "}
                         <Link href="/auth/login" className="underline">
-                            Login
+                            login
                         </Link>
                     </div>
                 </CardContent>
