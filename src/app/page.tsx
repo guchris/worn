@@ -1,5 +1,4 @@
 // App Imports
-import TopBar from "@/components/top-bar"
 import DemoPlayground from "@/components/demo-playground"
 
 export default function Landing() {

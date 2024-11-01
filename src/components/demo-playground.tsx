@@ -20,7 +20,7 @@ interface DraggableItem {
 
 export default function DemoPlayground() {
     const router = useRouter();
-    const MIN_DISTANCE = 100;
+    const MIN_DISTANCE = 200;
 
     // Function to generate random positions ensuring minimum distance
     function generateRandomPosition(existingItems: DraggableItem[]): { x: number; y: number } {
@@ -213,8 +213,11 @@ export default function DemoPlayground() {
                             />
                         )}
                         {item.type === "text" && item.content && (
-                            <p className={`text-sm ${item.content === "worn" ? "font-semibold" : ""} 
-                                ${["login", "join"].includes(item.content) ? "hover:underline" : ""} ${["login", "sign up"].includes(item.content) ? "text-right" : ""}`}>
+                            <p 
+                                className={`text-sm ${item.content === "worn" ? "font-semibold" : ""} 
+                                    ${["login", "join"].includes(item.content) ? "underline hover:font-bold cursor-pointer text-right" : ""}`}
+                                style={{ userSelect: "none" }}
+                            >
                                 {item.content}
                             </p>
                         )}
