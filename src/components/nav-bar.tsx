@@ -3,7 +3,11 @@
 // Next Imports
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 
+// App Imports
+import { User } from "@/lib/types"
+import { fetchUserData } from "@/lib/firebaseFunctions"
 
 // Shadcn Imports
 import { Button } from "@/components/ui/button"
@@ -11,7 +15,7 @@ import { Sheet, SheetTrigger, SheetContent, SheetTitle } from "@/components/ui/s
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Menu } from "lucide-react"
 
-export default function TopBar() {
+export default function NavBar() {
     const currentPath = usePathname();
 
     // Function to add "font-bold" to the active link
@@ -21,8 +25,11 @@ export default function TopBar() {
     return (
         <>
             {/* Desktop Side Navigation */}
-            <div className="hidden md:flex flex-col h-screen w-64 p-8 space-y-4">
-                <h1 className="text-sm font-semibold">worn</h1>
+            <div className="hidden md:flex flex-col h-screen w-64 p-8 space-y-8">
+                <div>
+                    <h1 className="text-sm font-semibold">worn</h1>
+                    <h2 className="text-sm">fashion for you</h2>
+                </div>
                 <nav className="text-sm">
                     <Link href="/home" className={getLinkClass("/home")}>home</Link>
                     <Link href="/closet" className={getLinkClass("/closet")}>closet</Link>
@@ -41,7 +48,7 @@ export default function TopBar() {
                         </Button>
                     </SheetTrigger>
 
-                    <SheetContent side="left" className="flex flex-col space-y-4 w-full h-full p-4 pl-8">
+                    <SheetContent side="left" className="flex flex-col space-y-8 w-full h-full p-4 pl-8">
                         <SheetTitle asChild>
                             <VisuallyHidden>worn navigation menu</VisuallyHidden>
                         </SheetTitle>
@@ -49,6 +56,12 @@ export default function TopBar() {
                             <h1 className="text-sm font-semibold">worn</h1>
                             <h2 className="text-sm">fashion for you</h2>
                         </div>
+                        {/* {user && (
+                            <div>
+                                <p className="text-sm">{user.name}</p>
+                                <p className="text-sm">{user.username}</p>
+                            </div>
+                        )} */}
                         <nav className="text-sm">
                             <Link href="/home" className={getLinkClass("/home")}>home</Link>
                             <Link href="/closet" className={getLinkClass("/closet")}>closet</Link>
