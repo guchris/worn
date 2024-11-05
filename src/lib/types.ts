@@ -1,7 +1,9 @@
 export interface User {
+    uid: string;
     name: string;
     username: string;
     email: string;
+    createdAt: Date;
 }
 
 export interface Item {
