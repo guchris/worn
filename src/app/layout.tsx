@@ -15,8 +15,6 @@ export const metadata: Metadata = {
 	description: "fashion for you",
 };
 
-export const dynamic = 'force-dynamic'
-
 export default function RootLayout({
 	children,
 }: Readonly<{
