@@ -3,7 +3,7 @@
 // Next and React Imports
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 // Other Imports
 import { ArrowUpIcon, ArrowDownIcon, SizeIcon } from "@radix-ui/react-icons"
@@ -22,7 +22,17 @@ interface DraggableItem {
 
 export default function DemoPlayground() {
     const router = useRouter();
-    const MIN_DISTANCE = 200;
+    const MIN_DISTANCE = 50;
+
+    const [items, setItems] = useState<DraggableItem[]>([]);
+    const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+    const [touchOffset, setTouchOffset] = useState({ offsetX: 0, offsetY: 0 });
+
+    // Reference to track resizing in mobile
+    const initialSize = useRef({ width: 90, height: 120 });
+    const lastTouchPosition = useRef({ x: 0, y: 0 });
 
     // Function to generate random positions ensuring minimum distance
     function generateRandomPosition(existingItems: DraggableItem[]): { x: number; y: number } {
@@ -44,8 +54,6 @@ export default function DemoPlayground() {
     
         return { x, y };
     }
-
-    const [items, setItems] = useState<DraggableItem[]>([]);
 
     // Set initial items after component mounts
     useEffect(() => {
@@ -69,18 +77,13 @@ export default function DemoPlayground() {
                 zIndex: i,
                 type: "image",
                 src: `/playground/item${i}.png`,
-                width: window.innerWidth >= 768 ? 135 : 90,   // Default width
-                height: window.innerWidth >= 768 ? 180 : 120  // Default height
+                width: 90,
+                height: 120
             });
         }
 
         setItems(initialItems);
     }, []);
-
-    const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isResizing, setIsResizing] = useState(false);
-    const [touchOffset, setTouchOffset] = useState({ offsetX: 0, offsetY: 0 });
 
     // Bringing an item to the front
     const bringToFront = (id: number) => {
@@ -146,21 +149,34 @@ export default function DemoPlayground() {
         setIsResizing(true);
     };
 
+    const handleResizeTouchStart = (id: number, event: React.TouchEvent) => {
+        event.stopPropagation();
+        setSelectedItemId(id);
+        setIsResizing(true);
+        
+        const touch = event.touches[0];
+        lastTouchPosition.current = { x: touch.clientX, y: touch.clientY };
+    
+        const item = items.find((item) => item.id === id);
+        if (item && item.width && item.height) {
+            initialSize.current = { width: item.width, height: item.height };
+        }
+    };
+
     const handleResizeMouseUp = () => {
         setIsResizing(false);
     };
 
-    // Stops dragging on mouse release
     const handleMouseUp = () => {
         setIsDragging(false);
+        setIsResizing(false);
     };
 
-    // Stops dragging on touch release (for mobile)
     const handleTouchEnd = () => {
         setIsDragging(false);
+        setIsResizing(false);
     };
 
-    // Updates position based on mouse movement while dragging
     const handleMouseMove = (event: React.MouseEvent) => {
         if (isDragging && selectedItemId !== null) {
             const { movementX, movementY } = event;
@@ -185,11 +201,11 @@ export default function DemoPlayground() {
         }
     };
 
-    // Updates position based on touch movement while dragging (for mobile)
     const handleTouchMove = (event: React.TouchEvent) => {
+        const touch = event.touches[0];
+
         if (isDragging && selectedItemId !== null) {
             event.preventDefault();
-            const touch = event.touches[0];
             setItems((prevItems) =>
                 prevItems.map((item) =>
                     item.id === selectedItemId
@@ -197,6 +213,24 @@ export default function DemoPlayground() {
                             ...item,
                             x: touch.clientX - touchOffset.offsetX,
                             y: touch.clientY - touchOffset.offsetY,
+                        }
+                        : item
+                )
+            );
+        }
+
+        if (isResizing && selectedItemId !== null) {
+            event.preventDefault();
+            const dx = touch.clientX - lastTouchPosition.current.x;
+            const dy = touch.clientY - lastTouchPosition.current.y;
+
+            setItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === selectedItemId
+                        ? {
+                            ...item,
+                            width: initialSize.current.width + dx,
+                            height: initialSize.current.height + dy,
                         }
                         : item
                 )
@@ -210,19 +244,10 @@ export default function DemoPlayground() {
                 className="relative w-full h-full"
                 style={{ touchAction: "none" }}
                 onMouseMove={handleMouseMove}
-                onMouseUp={() => {
-                    setIsDragging(false);
-                    handleResizeMouseUp();
-                }}
-                onMouseLeave={() => {
-                    setIsDragging(false);
-                    handleResizeMouseUp();
-                }}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={() => {
-                    setIsDragging(false);
-                    handleResizeMouseUp();
-                }}
+                onTouchEnd={handleTouchEnd}
                 onMouseDown={() => setSelectedItemId(null)}
                 onTouchStart={() => setSelectedItemId(null)}
             >
@@ -263,6 +288,7 @@ export default function DemoPlayground() {
                                             transform: "rotate(90deg)",
                                         }}
                                         onMouseDown={(e) => handleResizeMouseDown(item.id, e)}
+                                        onTouchStart={(e) => handleResizeTouchStart(item.id, e)}
                                     >
                                         <SizeIcon />
                                     </div>
