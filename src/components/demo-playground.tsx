@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 // Other Imports
-import { ArrowUpIcon, ArrowDownIcon } from "@radix-ui/react-icons"
+import { ArrowUpIcon, ArrowDownIcon, SizeIcon } from "@radix-ui/react-icons"
 
 interface DraggableItem {
     id: number;
@@ -16,6 +16,8 @@ interface DraggableItem {
     type: "image" | "text";
     src?: string;
     content?: string;
+    width?: number;
+    height?: number;
 }
 
 export default function DemoPlayground() {
@@ -53,14 +55,23 @@ export default function DemoPlayground() {
             { id: 12, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you" },
             
             // Right-aligned text items positioned conditionally for mobile and desktop
-            { id: 13, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login" },
-            { id: 14, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 14, type: "text", content: "join" },
+            // { id: 13, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login" },
+            // { id: 14, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 14, type: "text", content: "join" },
         ];
 
         // Generate random positions for image items without overlap
         for (let i = 1; i <= 10; i++) {
             const { x, y } = generateRandomPosition(initialItems);
-            initialItems.push({ id: i, x, y, zIndex: i, type: "image", src: `/playground/item${i}.png` });
+            initialItems.push({
+                id: i,
+                x,
+                y,
+                zIndex: i,
+                type: "image",
+                src: `/playground/item${i}.png`,
+                width: window.innerWidth >= 768 ? 135 : 90,   // Default width
+                height: window.innerWidth >= 768 ? 180 : 120  // Default height
+            });
         }
 
         setItems(initialItems);
@@ -68,6 +79,7 @@ export default function DemoPlayground() {
 
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
     const [touchOffset, setTouchOffset] = useState({ offsetX: 0, offsetY: 0 });
 
     // Bringing an item to the front
@@ -128,6 +140,16 @@ export default function DemoPlayground() {
         }
     };
 
+    const handleResizeMouseDown = (id: number, event: React.MouseEvent) => {
+        event.stopPropagation();
+        setSelectedItemId(id);
+        setIsResizing(true);
+    };
+
+    const handleResizeMouseUp = () => {
+        setIsResizing(false);
+    };
+
     // Stops dragging on mouse release
     const handleMouseUp = () => {
         setIsDragging(false);
@@ -146,6 +168,17 @@ export default function DemoPlayground() {
                 prevItems.map((item) =>
                     item.id === selectedItemId
                         ? { ...item, x: item.x + movementX, y: item.y + movementY }
+                        : item
+                )
+            );
+        }
+    
+        if (isResizing && selectedItemId !== null) {
+            const { movementX, movementY } = event;
+            setItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.id === selectedItemId && item.width && item.height
+                        ? { ...item, width: item.width + movementX, height: item.height + movementY }
                         : item
                 )
             );
@@ -177,10 +210,19 @@ export default function DemoPlayground() {
                 className="relative w-full h-full"
                 style={{ touchAction: "none" }}
                 onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
+                onMouseUp={() => {
+                    setIsDragging(false);
+                    handleResizeMouseUp();
+                }}
+                onMouseLeave={() => {
+                    setIsDragging(false);
+                    handleResizeMouseUp();
+                }}
                 onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+                onTouchEnd={() => {
+                    setIsDragging(false);
+                    handleResizeMouseUp();
+                }}
                 onMouseDown={() => setSelectedItemId(null)}
                 onTouchStart={() => setSelectedItemId(null)}
             >
@@ -203,14 +245,29 @@ export default function DemoPlayground() {
                         }}
                     >
                         {item.type === "image" && item.src && (
-                            <Image
-                                src={item.src}
-                                alt={`Image ${item.id}`}
-                                width={window.innerWidth >= 768 ? 135 : 90}
-                                height={window.innerWidth >= 768 ? 180 : 120}
-                                className="object-cover rounded"
-                                draggable="false"
-                            />
+                            <div style={{ position: "relative" }}>
+                                <Image
+                                    src={item.src}
+                                    alt={`Image ${item.id}`}
+                                    width={item.width}
+                                    height={item.height}
+                                    className="object-cover rounded"
+                                    draggable="false"
+                                />
+                                {selectedItemId === item.id && (
+                                    <div
+                                        className="absolute p-1 cursor-nwse-resize"
+                                        style={{
+                                            bottom: "0px",
+                                            right: "0px",
+                                            transform: "rotate(90deg)",
+                                        }}
+                                        onMouseDown={(e) => handleResizeMouseDown(item.id, e)}
+                                    >
+                                        <SizeIcon />
+                                    </div>
+                                )}
+                            </div>
                         )}
                         {item.type === "text" && item.content && (
                             <p 
@@ -222,13 +279,13 @@ export default function DemoPlayground() {
                             </p>
                         )}
                         {selectedItemId === item.id && item.type === "image" && (
-                            <div className="absolute top-0 right-0 flex flex-col space-y-1 p-1">
+                            <div className="absolute top-0 right-0 flex flex-col space-y-1">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         bringToFront(item.id);
                                     }}
-                                    className="p-1 bg-white rounded-full shadow hover:bg-gray-200"
+                                    className="p-1 hover:bg-gray-200"
                                 >
                                     <ArrowUpIcon />
                                 </button>
@@ -237,7 +294,7 @@ export default function DemoPlayground() {
                                         e.stopPropagation();
                                         sendToBack(item.id);
                                     }}
-                                    className="p-1 bg-white rounded-full shadow hover:bg-gray-200"
+                                    className="p-1 hover:bg-gray-200"
                                 >
                                     <ArrowDownIcon />
                                 </button>
