@@ -16,13 +16,16 @@ interface DraggableItem {
     type: "image" | "text";
     src?: string;
     content?: string;
-    width?: number;
-    height?: number;
+    width: number;
+    height: number;
 }
 
 export default function DemoPlayground() {
     const router = useRouter();
-    const MIN_DISTANCE = 50;
+    const DEFAULT_HEIGHT = 120;
+    const DEFAULT_WIDTH = 90;
+    const MIN_HEIGHT = 69;
+    const MIN_WIDTH = 51.75;
 
     const [items, setItems] = useState<DraggableItem[]>([]);
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
@@ -34,10 +37,10 @@ export default function DemoPlayground() {
     const initialSize = useRef({ width: 90, height: 120 });
     const lastTouchPosition = useRef({ x: 0, y: 0 });
 
-    // Function to generate random positions ensuring minimum distance
-    function generateRandomPosition(existingItems: DraggableItem[]): { x: number; y: number } {
-        const maxX = window.innerWidth - 100;
-        const maxY = window.innerHeight - 120;
+    // Function to generate random positions ensuring items do not touch each other
+    function generateRandomPosition(existingItems: DraggableItem[], itemWidth: number, itemHeight: number): { x: number; y: number } {
+        const maxX = window.innerWidth - itemWidth;
+        const maxY = window.innerHeight - itemHeight;
     
         let x: number, y: number, isTooClose: boolean;
     
@@ -45,11 +48,19 @@ export default function DemoPlayground() {
             x = Math.floor(Math.random() * maxX);
             y = Math.floor(Math.random() * maxY);
     
-            // Check if the new position is too close to existing items
-            isTooClose = existingItems.some(
-                (item) =>
-                    Math.abs(item.x - x) < MIN_DISTANCE && Math.abs(item.y - y) < MIN_DISTANCE
-            );
+            // Check if the new position is too close to existing items (both text and image)
+            isTooClose = existingItems.some((item) => {
+                const itemRight = item.x + (item.width || 0);
+                const itemBottom = item.y + (item.height || 0);
+                const newItemRight = x + itemWidth;
+                const newItemBottom = y + itemHeight;
+    
+                // Check for overlap between the new item and the existing item
+                const noHorizontalOverlap = newItemRight <= item.x || x >= itemRight;
+                const noVerticalOverlap = newItemBottom <= item.y || y >= itemBottom;
+    
+                return !(noHorizontalOverlap || noVerticalOverlap);
+            });
         } while (isTooClose);
     
         return { x, y };
@@ -59,8 +70,8 @@ export default function DemoPlayground() {
     useEffect(() => {
         const initialItems: DraggableItem[] = [
             // Left-aligned text items positioned conditionally for mobile and desktop
-            { id: 11, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn" },
-            { id: 12, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you" },
+            { id: 11, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn", width: 35, height: 20 },
+            { id: 12, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you", width: 100, height: 20 },
             
             // Right-aligned text items positioned conditionally for mobile and desktop
             // { id: 13, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login" },
@@ -69,7 +80,7 @@ export default function DemoPlayground() {
 
         // Generate random positions for image items without overlap
         for (let i = 1; i <= 10; i++) {
-            const { x, y } = generateRandomPosition(initialItems);
+            const { x, y } = generateRandomPosition(initialItems, DEFAULT_WIDTH, DEFAULT_HEIGHT);
             initialItems.push({
                 id: i,
                 x,
@@ -77,8 +88,8 @@ export default function DemoPlayground() {
                 zIndex: i,
                 type: "image",
                 src: `/playground/item${i}.png`,
-                width: 90,
-                height: 120
+                width: DEFAULT_WIDTH,
+                height: DEFAULT_HEIGHT
             });
         }
 
@@ -147,6 +158,11 @@ export default function DemoPlayground() {
         event.stopPropagation();
         setSelectedItemId(id);
         setIsResizing(true);
+
+        const item = items.find((item) => item.id === id);
+        if (item) {
+            initialSize.current = { width: item.width, height: item.height };
+        }
     };
 
     const handleResizeTouchStart = (id: number, event: React.TouchEvent) => {
@@ -161,10 +177,6 @@ export default function DemoPlayground() {
         if (item && item.width && item.height) {
             initialSize.current = { width: item.width, height: item.height };
         }
-    };
-
-    const handleResizeMouseUp = () => {
-        setIsResizing(false);
     };
 
     const handleMouseUp = () => {
@@ -239,7 +251,7 @@ export default function DemoPlayground() {
     };
 
     return (
-        <div className="w-full h-screen overflow-hidden">
+        <div className="relative w-full h-screen overflow-hidden">
             <div
                 className="relative w-full h-full"
                 style={{ touchAction: "none" }}
@@ -270,7 +282,13 @@ export default function DemoPlayground() {
                         }}
                     >
                         {item.type === "image" && item.src && (
-                            <div style={{ position: "relative" }}>
+                            <div
+                                style={{
+                                    position: "relative",
+                                    minWidth: `${MIN_WIDTH}px`,
+                                    minHeight: `${MIN_HEIGHT}px`
+                                }}
+                            >
                                 <Image
                                     src={item.src}
                                     alt={`Image ${item.id}`}
@@ -305,7 +323,7 @@ export default function DemoPlayground() {
                             </p>
                         )}
                         {selectedItemId === item.id && item.type === "image" && (
-                            <div className="absolute top-0 right-0 flex flex-col space-y-1">
+                            <div className="absolute top-0 right-0 flex flex-col">
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
