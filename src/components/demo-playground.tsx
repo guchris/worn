@@ -70,28 +70,32 @@ export default function DemoPlayground() {
     useEffect(() => {
         const initialItems: DraggableItem[] = [
             // Left-aligned text items positioned conditionally for mobile and desktop
-            { id: 11, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn", width: 35, height: 20 },
-            { id: 12, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you", width: 100, height: 20 },
+            { id: 16, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn", width: 35, height: 20 },
+            { id: 17, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you", width: 100, height: 20 },
             
             // Right-aligned text items positioned conditionally for mobile and desktop
             // { id: 13, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login" },
             // { id: 14, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 14, type: "text", content: "join" },
         ];
 
-        // Generate random positions for image items without overlap
-        for (let i = 1; i <= 10; i++) {
+        // Shuffle and pick 10 random images from the 15 available
+        const randomImageIds = Array.from({ length: 15 }, (_, i) => i + 1)
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 10);
+
+        randomImageIds.forEach((id, index) => {
             const { x, y } = generateRandomPosition(initialItems, DEFAULT_WIDTH, DEFAULT_HEIGHT);
             initialItems.push({
-                id: i,
+                id,
                 x,
                 y,
-                zIndex: i,
+                zIndex: index,
                 type: "image",
-                src: `/playground/item${i}.png`,
+                src: `/playground/item${id}.png`,
                 width: DEFAULT_WIDTH,
-                height: DEFAULT_HEIGHT
+                height: DEFAULT_HEIGHT,
             });
-        }
+        });
 
         setItems(initialItems);
     }, []);
@@ -253,7 +257,7 @@ export default function DemoPlayground() {
     return (
         <div className="relative w-full h-screen overflow-hidden">
             <div
-                className="relative w-full h-full"
+                className="w-full h-full"
                 style={{ touchAction: "none" }}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
