@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState, useRef } from "react"
 
 // Other Imports
+import { useAuth } from "@/context/AuthContext"
 import { ArrowUpIcon, ArrowDownIcon, SizeIcon } from "@radix-ui/react-icons"
 
 interface DraggableItem {
@@ -21,7 +22,16 @@ interface DraggableItem {
 }
 
 export default function DemoPlayground() {
+    const { user } = useAuth();
     const router = useRouter();
+
+    // Redirect logged-in users to the home page
+    useEffect(() => {
+        if (user) {
+            router.push("/home");
+        }
+    }, [user, router]);
+
     const DEFAULT_HEIGHT = 120;
     const DEFAULT_WIDTH = 90;
     const MIN_HEIGHT = 69;

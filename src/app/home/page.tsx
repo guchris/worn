@@ -10,18 +10,19 @@ import { useAuth } from "@/context/AuthContext"
 
 
 export default function Home() {
-
-	const { user } = useAuth();
+	const { user, loading } = useAuth();
     const router = useRouter();
 
-	// Redirect only when "user" changes
 	useEffect(() => {
-        if (!user) {
+        if (!loading && !user) {
             router.push("/auth/login");
         }
-    }, [user, router]);
+    }, [user, loading, router]);
 
-	// Show nothing while redirecting
+	if (loading) {
+        return <p className="p-4 text-sm">loading</p>;
+    }
+
     if (!user) {
         return null;
     }

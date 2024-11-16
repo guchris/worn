@@ -2,10 +2,12 @@
 
 // Next Imports
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 // App Imports
 import { useAuth } from "@/context/AuthContext"
+import { auth } from "@/lib/firebase"
+import { signOut } from "firebase/auth"
 
 // Shadcn Imports
 import { Button } from "@/components/ui/button"
@@ -27,10 +29,21 @@ const NavLinks = ({ getLinkClass }: { getLinkClass: (path: string) => string }) 
 export default function NavBar() {
     const currentPath = usePathname();
     const { userData } = useAuth();
+    const router = useRouter();
 
     // Function to add "font-bold" to the active link
     const getLinkClass = (path: string) =>
         `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""} ${currentPath === path ? "aria-current='page'" : ""}`;
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            router.push("/");
+            console.log("User signed out successfully");
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
     
     return (
         <>
@@ -49,6 +62,9 @@ export default function NavBar() {
                 <nav className="text-sm">
                     <NavLinks getLinkClass={getLinkClass} />
                 </nav>
+                <Button variant="link" onClick={handleLogout} className="block hover:text-gray-500 text-left">
+                    logout
+                </Button>
             </div>
 
             {/* Mobile Hamburger Menu */}
