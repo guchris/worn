@@ -3,6 +3,7 @@
 // Next and React Imports
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 // App Imports
 import NavBar from "@/components/nav-bar"
@@ -35,8 +36,12 @@ export default function ClosetPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="p-8">
-                <p className="text-sm">closet</p>
+            <div className="w-full p-6 md:p-8">
+				<div className="flex items-center justify-between">
+					{/* <Link href="/add-item" className="text-sm hover:text-gray-500" passHref>
+						+ add clothing item
+					</Link> */}
+				</div>
             </div>
 		</div>
 		// <div>

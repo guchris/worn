@@ -31,6 +31,16 @@ export default function NavBar() {
     const { userData } = useAuth();
     const router = useRouter();
 
+    const tabNames: { [key: string]: string } = {
+        "/home": "home",
+        "/closet": "closet",
+        "/playground": "playground",
+        "/generator": "generator",
+        "/numbers": "numbers",
+    };
+
+    const currentTab = tabNames[currentPath] || "";
+
     // Function to add "font-bold" to the active link
     const getLinkClass = (path: string) =>
         `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""} ${currentPath === path ? "aria-current='page'" : ""}`;
@@ -54,7 +64,7 @@ export default function NavBar() {
                     <h2 className="text-sm">fashion for you</h2>
                 </div>
                 <nav className="text-sm">
-                    <NavLinks getLinkClass={getLinkClass} />
+                    <NavLinks getLinkClass={(path) => `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""}`} />
                 </nav>
                 {userData && (
                     <div className="text-sm">
@@ -69,35 +79,38 @@ export default function NavBar() {
 
             {/* Mobile Hamburger Menu */}
             <div className="md:hidden flex items-center justify-between p-4 w-full">
-                <Sheet>
-                    <SheetTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Menu className="h-4 w-4" />
-                        </Button>
-                    </SheetTrigger>
+                <div className="flex items-center gap-4">
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <Menu className="h-4 w-4" />
+                            </Button>
+                        </SheetTrigger>
 
-                    <SheetContent side="left" className="flex flex-col space-y-4 w-full h-full p-4 pl-8">
-                        <SheetTitle asChild>
-                            <VisuallyHidden>worn navigation menu</VisuallyHidden>
-                        </SheetTitle>
-                        <div>
-                            <h1 className="text-sm font-semibold">worn</h1>
-                            <h2 className="text-sm">fashion for you</h2>
-                        </div>
-                        <nav className="text-sm">
-                            <NavLinks getLinkClass={getLinkClass} />
-                        </nav>
-                        {userData && (
-                            <div className="text-sm">
-                                <p className="line-clamp-1 text-gray-500">{userData.username}</p>
-                                <p className="line-clamp-1 text-gray-500">{userData.email}</p>
+                        <SheetContent side="left" className="flex flex-col space-y-4 w-full h-full p-4 pl-8">
+                            <SheetTitle asChild>
+                                <VisuallyHidden>worn navigation menu</VisuallyHidden>
+                            </SheetTitle>
+                            <div>
+                                <h1 className="text-sm font-semibold">worn</h1>
+                                <h2 className="text-sm">fashion for you</h2>
                             </div>
-                        )}
-                        <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
-                            logout
-                        </Button>
-                    </SheetContent>
-                </Sheet>
+                            <nav className="text-sm">
+                                <NavLinks getLinkClass={(path) => `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""}`} />
+                            </nav>
+                            {userData && (
+                                <div className="text-sm">
+                                    <p className="line-clamp-1 text-gray-500">{userData.username}</p>
+                                    <p className="line-clamp-1 text-gray-500">{userData.email}</p>
+                                </div>
+                            )}
+                            <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
+                                logout
+                            </Button>
+                        </SheetContent>
+                    </Sheet>
+                    <header className="text-sm">{currentTab}</header>
+                </div>
             </div>
         </>
     )

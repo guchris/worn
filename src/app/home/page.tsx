@@ -20,7 +20,7 @@ export default function Home() {
     }, [user, loading, router]);
 
 	if (loading) {
-        return <p className="p-4 text-sm">loading</p>;
+        return null;
     }
 
     if (!user) {
@@ -31,7 +31,6 @@ export default function Home() {
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
 			<div className="p-8">
-                <p className="text-sm">home</p>
             </div>
 		</div>
 	)
