@@ -16,34 +16,38 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { Menu } from "lucide-react"
 
 
-const NavLinks = ({ getLinkClass }: { getLinkClass: (path: string) => string }) => (
-    <>
-        <Link href="/home" className={getLinkClass("/home")}>home</Link>
-        <Link href="/closet" className={getLinkClass("/closet")}>closet</Link>
-        <Link href="/playground" className={getLinkClass("/playground")}>playground</Link>
-        <Link href="/generator" className={getLinkClass("/generator")}>generator</Link>
-        <Link href="/numbers" className={getLinkClass("/numbers")}>numbers</Link>
-    </>
-);
+const NavLinks = () => {
+    const currentPath = usePathname();
+
+    const linkStyles: { [key: string]: string } = {
+        "/home": "hover:text-amber-500 text-amber-500",
+        "/closet": "hover:text-green-500 text-green-500",
+        "/playground": "hover:text-blue-500 text-blue-500",
+        "/generator": "hover:text-purple-500 text-purple-500",
+        "/numbers": "hover:text-pink-500 text-pink-500",
+    };
+
+    const getLinkClass = (path: string) => {
+        const baseClass = "block";
+        const activeClass = currentPath === path ? `${linkStyles[path]} font-semibold` : linkStyles[path].split(" ")[0]; // Keep hover color even if not active
+        return `${baseClass} ${activeClass}`;
+    };
+
+    return (
+        <>
+            <Link href="/home" className={getLinkClass("/home")}>home</Link>
+            <Link href="/closet" className={getLinkClass("/closet")}>closet</Link>
+            <Link href="/playground" className={getLinkClass("/playground")}>playground</Link>
+            <Link href="/generator" className={getLinkClass("/generator")}>generator</Link>
+            <Link href="/numbers" className={getLinkClass("/numbers")}>numbers</Link>
+        </>
+    );
+};
 
 export default function NavBar() {
     const currentPath = usePathname();
     const { userData } = useAuth();
     const router = useRouter();
-
-    const tabNames: { [key: string]: string } = {
-        "/home": "home",
-        "/closet": "closet",
-        "/playground": "playground",
-        "/generator": "generator",
-        "/numbers": "numbers",
-    };
-
-    const currentTab = tabNames[currentPath] || "";
-
-    // Function to add "font-bold" to the active link
-    const getLinkClass = (path: string) =>
-        `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""} ${currentPath === path ? "aria-current='page'" : ""}`;
 
     const handleLogout = async () => {
         try {
@@ -64,7 +68,7 @@ export default function NavBar() {
                     <h2 className="text-sm">fashion for you</h2>
                 </div>
                 <nav className="text-sm">
-                    <NavLinks getLinkClass={(path) => `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""}`} />
+                    <NavLinks />
                 </nav>
                 {userData && (
                     <div className="text-sm">
@@ -72,7 +76,7 @@ export default function NavBar() {
                         <p className="line-clamp-1 text-gray-500">{userData.email}</p>
                     </div>
                 )}
-                <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
+                <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-red-500 px-0">
                     logout
                 </Button>
             </div>
@@ -96,7 +100,7 @@ export default function NavBar() {
                                 <h2 className="text-sm">fashion for you</h2>
                             </div>
                             <nav className="text-sm">
-                                <NavLinks getLinkClass={(path) => `block hover:text-gray-500 ${currentPath === path ? "font-semibold" : ""}`} />
+                                <NavLinks />
                             </nav>
                             {userData && (
                                 <div className="text-sm">
@@ -109,7 +113,7 @@ export default function NavBar() {
                             </Button>
                         </SheetContent>
                     </Sheet>
-                    <header className="text-sm">{currentTab}</header>
+                    <header className="text-sm">{currentPath.split("/")[1] || "home"}</header>
                 </div>
             </div>
         </>

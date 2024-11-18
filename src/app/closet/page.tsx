@@ -8,16 +8,8 @@ import Link from "next/link"
 // App Imports
 import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
-import SidebarApp from "@/components/sidebar-app"
-import ClosetGrid from "@/components/closet-grid"
-
-// Shadcn Imports
-import { Separator } from "@/components/ui/separator"
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 
 export default function ClosetPage() {
-
 	const { user } = useAuth();
     const router = useRouter();
 
@@ -38,34 +30,12 @@ export default function ClosetPage() {
             <NavBar />
             <div className="w-full p-6 md:p-8">
 				<div className="flex items-center justify-between">
-					{/* <Link href="/add-item" className="text-sm hover:text-gray-500" passHref>
+					<p className="hidden md:block text-sm">closet</p>
+					<Link href="/add-item" className="text-sm hover:text-green-500" passHref>
 						+ add clothing item
-					</Link> */}
+					</Link>
 				</div>
             </div>
 		</div>
-		// <div>
-		// 	<SidebarProvider>
-
-		// 		<SidebarApp />
-
-		// 		<SidebarInset>
-		// 			<header className="sticky top-0 flex h-16 items-center gap-2 border-b bg-background px-4">
-		// 				<SidebarTrigger className="-ml-1" />
-		// 				<Separator orientation="vertical" className="mr-2 h-4" />
-		// 				<Breadcrumb>
-		// 					<BreadcrumbList>
-		// 						<BreadcrumbItem>
-		// 							<BreadcrumbPage>My Closet</BreadcrumbPage>
-		// 						</BreadcrumbItem>
-		// 					</BreadcrumbList>
-		// 				</Breadcrumb>
-		// 			</header>
-		// 			<div className="flex flex-1 flex-col gap-4 p-4">
-		// 				{/* <ClosetGrid /> */}
-		// 			</div>
-		// 		</SidebarInset>
-		// 	</SidebarProvider>
-		// </div>
 	)
 }
