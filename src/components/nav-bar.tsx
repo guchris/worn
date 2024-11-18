@@ -96,24 +96,24 @@ export default function NavBar() {
                                 <VisuallyHidden>worn navigation menu</VisuallyHidden>
                             </SheetTitle>
                             <div>
-                                <h1 className="text-sm font-semibold">worn</h1>
-                                <h2 className="text-sm">fashion for you</h2>
+                                <h1 className="font-semibold">worn</h1>
+                                <h2 className="">fashion for you</h2>
                             </div>
-                            <nav className="text-sm">
+                            <nav className="">
                                 <NavLinks />
                             </nav>
                             {userData && (
-                                <div className="text-sm">
+                                <div className="">
                                     <p className="line-clamp-1 text-gray-500">{userData.username}</p>
                                     <p className="line-clamp-1 text-gray-500">{userData.email}</p>
                                 </div>
                             )}
-                            <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
+                            <Button variant="link" onClick={handleLogout} className="block text-left text-base hover:no-underline hover:text-red-500 px-0">
                                 logout
                             </Button>
                         </SheetContent>
                     </Sheet>
-                    <header className="text-sm">{currentPath.split("/")[1] || "home"}</header>
+                    <header className="">{currentPath.split("/")[1] || "home"}</header>
                 </div>
             </div>
         </>
