@@ -80,12 +80,12 @@ export default function DemoPlayground() {
     useEffect(() => {
         const initialItems: DraggableItem[] = [
             // Left-aligned text items positioned conditionally for mobile and desktop
-            { id: 16, x: 30, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 11, type: "text", content: "worn", width: 35, height: 20 },
-            { id: 17, x: 30, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 12, type: "text", content: "fashion for you", width: 100, height: 20 },
+            { id: 16, x: 30, y: 20, zIndex: 11, type: "text", content: "worn", width: 35, height: 20 },
+            { id: 17, x: 30, y: 40, zIndex: 12, type: "text", content: "fashion for you", width: 100, height: 20 },
             
             // Right-aligned text items positioned conditionally for mobile and desktop
-            { id: 18, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: window.innerWidth >= 768 ? 20 : window.innerHeight - 80, zIndex: 13, type: "text", content: "login", width: 32, height: 20 },
-            { id: 19, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: window.innerWidth >= 768 ? 40 : window.innerHeight - 60, zIndex: 14, type: "text", content: "join", width: 24, height: 20 },
+            { id: 18, x: window.innerWidth >= 768 ? window.innerWidth - 70 : window.innerWidth - 80, y: 20, zIndex: 13, type: "text", content: "login", width: 32, height: 20 },
+            { id: 19, x: window.innerWidth >= 768 ? window.innerWidth - 62 : window.innerWidth - 72, y: 40, zIndex: 14, type: "text", content: "join", width: 24, height: 20 },
         ];
 
         // Shuffle and pick 10 random images from the 15 available

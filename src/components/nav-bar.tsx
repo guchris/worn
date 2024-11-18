@@ -53,16 +53,16 @@ export default function NavBar() {
                     <h1 className="text-sm font-semibold">worn</h1>
                     <h2 className="text-sm">fashion for you</h2>
                 </div>
+                <nav className="text-sm">
+                    <NavLinks getLinkClass={getLinkClass} />
+                </nav>
                 {userData && (
                     <div className="text-sm">
                         <p className="line-clamp-1 text-gray-500">{userData.username}</p>
                         <p className="line-clamp-1 text-gray-500">{userData.email}</p>
                     </div>
                 )}
-                <nav className="text-sm">
-                    <NavLinks getLinkClass={getLinkClass} />
-                </nav>
-                <Button variant="link" onClick={handleLogout} className="block hover:text-gray-500 text-left">
+                <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
                     logout
                 </Button>
             </div>
@@ -84,15 +84,18 @@ export default function NavBar() {
                             <h1 className="text-sm font-semibold">worn</h1>
                             <h2 className="text-sm">fashion for you</h2>
                         </div>
+                        <nav className="text-sm">
+                            <NavLinks getLinkClass={getLinkClass} />
+                        </nav>
                         {userData && (
                             <div className="text-sm">
                                 <p className="line-clamp-1 text-gray-500">{userData.username}</p>
                                 <p className="line-clamp-1 text-gray-500">{userData.email}</p>
                             </div>
                         )}
-                        <nav className="text-sm">
-                            <NavLinks getLinkClass={getLinkClass} />
-                        </nav>
+                        <Button variant="link" onClick={handleLogout} className="block text-left hover:no-underline hover:text-gray-500 px-0">
+                            logout
+                        </Button>
                     </SheetContent>
                 </Sheet>
             </div>
