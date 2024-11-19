@@ -113,8 +113,8 @@ export default function AddItem() {
             await updateDoc(docRef, { id: docRef.id })
 
             toast({
-                title: "item added successfully",
-                description: "your clothing item has been added to your closet",
+                title: "item added",
+                description: `${values.name} by ${values.brand} has been added to your closet`,
             })
             router.push("/closet")
         } catch (e) {
