@@ -113,15 +113,15 @@ export default function AddItem() {
             await updateDoc(docRef, { id: docRef.id })
 
             toast({
-                title: "Item added successfully!",
-                description: "Your clothing item has been added to your closet.",
+                title: "item added successfully",
+                description: "your clothing item has been added to your closet",
             })
-            router.push("/")
+            router.push("/closet")
         } catch (e) {
             console.error("Error adding item:", e)
             toast({
-                title: "Error adding item",
-                description: "There was an error adding your item. Please try again.",
+                title: "error adding item",
+                description: "there was an error adding your item - please try again",
             })
         }
     }

@@ -11,6 +11,9 @@ import { Analytics } from "@vercel/analytics/react"
 // Context Imports
 import { AuthProvider } from "@/context/AuthContext"
 
+// Shadcn Imports
+import { Toaster } from "@/components/ui/toaster"
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -29,6 +32,7 @@ export default function RootLayout({
 				<body className={inter.className}>
 					{children}
 					<Analytics />
+					<Toaster />
 				</body>
 			</html>
 		</AuthProvider>
