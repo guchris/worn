@@ -16,24 +16,23 @@ import { collection, getDocs } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 
 export default function ClosetPage() {
-	const { user, loading: authLoading } = useAuth();
+	const { user, loading } = useAuth();
     const router = useRouter();
 	const [closetItems, setClosetItems] = useState<Item[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [closetLoading, setClosetLoading] = useState<boolean>(true);
 
-	 // Redirect to login only after authLoading is complete
-	 useEffect(() => {
-        if (!authLoading && !user) {
+	useEffect(() => {
+        if (!loading && !user) {
             router.push("/auth/login");
         }
-    }, [authLoading, user, router]);
+    }, [user, loading, router]);
 
 	// Fetch closet items for the current user
     useEffect(() => {
         const fetchClosetItems = async () => {
             if (!user) return;
 
-            setLoading(true);
+            setClosetLoading(true);
 
             try {
                 const closetCollection = collection(db, `users/${user.uid}/closet`);
@@ -43,7 +42,7 @@ export default function ClosetPage() {
             } catch (error) {
                 console.error("Error fetching closet items:", error);
             } finally {
-                setLoading(false);
+                setClosetLoading(false);
             }
         };
 
@@ -65,7 +64,7 @@ export default function ClosetPage() {
 						+ add clothing item
 					</Link>
 				</div>
-				<ClosetGrid items={closetItems} loading={loading} />
+				<ClosetGrid items={closetItems} loading={closetLoading} />
             </div>
 		</div>
 	)

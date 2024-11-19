@@ -10,15 +10,14 @@ import { useAuth } from "@/context/AuthContext"
 
 export default function NumbersPage() {
 
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
 
-	// Redirect only when "user" changes
 	useEffect(() => {
-        if (!user) {
+        if (!loading && !user) {
             router.push("/auth/login");
         }
-    }, [user, router]);
+    }, [user, loading, router]);
 
 	// Show nothing while redirecting
     if (!user) {
