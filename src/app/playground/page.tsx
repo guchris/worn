@@ -28,9 +28,7 @@ export default function PlaygroundPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="p-8">
-                <UserPlayground userId={user.uid} />
-            </div>
+            <UserPlayground userId={user.uid} />
 		</div>
 	)
 }
