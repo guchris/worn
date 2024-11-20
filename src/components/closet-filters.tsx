@@ -18,10 +18,13 @@ interface FilterItem {
 
 const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }) => {
     const [filterData, setFilterData] = useState<FilterItem[]>([
-        { name: "Categories", items: ["tops", "bottoms", "accessories"] },
+        { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
         { name: "Brand", items: [] },
     ]);
-    const [activeItems, setActiveItems] = useState<Record<string, boolean>>({});
+    const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({
+        Categories: [],
+        Brand: [],
+    });
 
     // Fetch unique brands and update the "Brand" filter section
     useEffect(() => {
@@ -37,54 +40,44 @@ const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }
         loadBrands();
     }, [userId]);
 
-    // Initialize active items state on load
+    // Notify parent component when activeFilters change
     useEffect(() => {
-        const defaultActiveItems = filterData.reduce((acc, filter) => {
-            filter.items.forEach((item) => {
-                acc[`${filter.name}-${item}`] = true; // Default to active for all
-            });
-            return acc;
-        }, {} as Record<string, boolean>);
-
-        setActiveItems(defaultActiveItems);
-    }, [filterData]);
-
-    // Apply filter updates after activeItems state changes
-    useEffect(() => {
-        const activeFilters: Record<string, string[]> = filterData.reduce((acc, filter) => {
-            acc[filter.name] = filter.items.filter((item) => activeItems[`${filter.name}-${item}`]);
-            return acc;
-        }, {} as Record<string, string[]>);
-
-        // Notify parent component
         onFiltersChange(activeFilters);
-    }, [activeItems]);
+    }, [activeFilters, onFiltersChange]);
 
-    // Toggle item state
-    const toggleItem = (filterName: string, item: string) => {
-        setActiveItems((prev) => ({
-            ...prev,
-            [`${filterName}-${item}`]: !prev[`${filterName}-${item}`],
-        }));
+    // Toggle filter state
+    const toggleFilter = (filterName: string, item: string) => {
+        setActiveFilters((prev) => {
+            const currentItems = prev[filterName] || [];
+            const isActive = currentItems.includes(item);
+
+            return {
+                ...prev,
+                [filterName]: isActive
+                    ? currentItems.filter((filterItem) => filterItem !== item) // Remove filter
+                    : [...currentItems, item], // Add filter
+            };
+        });
     };
 
     return (
-		<div className="hidden lg:block w-36 flex-shrink-0 space-y-6">
+		<div className="hidden lg:block w-36 flex-shrink-0 space-y-6 pl-4">
             {filterData.map((filter) => (
                 <div key={filter.name}>
-                    <div className="text-sm font-semibold">
-                        {filter.name.toLowerCase()}
-                    </div>
-                    <div className="mt-2 space-y-1">
+                    <div className="text-sm">{filter.name.toLowerCase()}</div>
+                    <div className="mt-2">
                         {filter.items.map((item) => (
-                            <label key={item} className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    checked={activeItems[`${filter.name}-${item}`] || false}
-                                    onChange={() => toggleItem(filter.name, item)}
-                                />
-                                <span className="line-clamp-1 text-sm">{item}</span>
-                            </label>
+                            <button
+                                key={item}
+                                onClick={() => toggleFilter(filter.name, item)}
+                                className={`text-sm text-left line-clamp-1 ${
+                                    activeFilters[filter.name]?.includes(item)
+                                        ? "font-bold text-green-500"
+                                        : "text-gray-500"
+                                }`}
+                            >
+                                {item}
+                            </button>
                         ))}
                     </div>
                 </div>

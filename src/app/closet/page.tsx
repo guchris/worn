@@ -90,20 +90,21 @@ export default function ClosetPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="w-full flex p-6 md:p-8 space-y-4">
-				{/* Closet Grid Section */}
-				<div className="flex-1 space-y-4">
-					<div className="flex items-center justify-between">
-						<p className="hidden md:block text-sm">closet</p>
-						<Link href="/add-item" className="text-sm hover:text-green-500" passHref>
-							+ add clothing item
-						</Link>
-					</div>
-					<ClosetGrid items={filteredItems} loading={closetLoading} />
-				</div>
-				{/* Filters Column */}
-				<ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
-			</div>
+
+            <div className="w-full flex p-6 md:p-8">
+                {/* Closet Grid Section */}
+                <div className="flex-1 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <p className="hidden md:block text-sm">closet</p>
+                        <Link href="/add-item" className="text-sm hover:text-green-500">
+                            + add clothing item
+                        </Link>
+                    </div>
+                    <ClosetGrid items={filteredItems} loading={closetLoading} />
+                </div>
+                {/* Filters Column */}
+                <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
+            </div>
 		</div>
 	)
 }
