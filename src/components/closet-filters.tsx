@@ -76,7 +76,7 @@ const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }
                                         : "text-gray-500"
                                 }`}
                             >
-                                {item}
+                                {item.toLowerCase()}
                             </button>
                         ))}
                     </div>

@@ -95,7 +95,7 @@ export default function ClosetPage() {
                 {/* Closet Grid Section */}
                 <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
-                        <p className="hidden md:block text-sm">closet</p>
+                        <p className="hidden md:block text-sm font-semibold">closet</p>
                         <Link href="/add-item" className="text-sm hover:text-green-500">
                             + add clothing item
                         </Link>
@@ -103,7 +103,10 @@ export default function ClosetPage() {
                     <ClosetGrid items={filteredItems} loading={closetLoading} />
                 </div>
                 {/* Filters Column */}
-                <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
+                <div className="space-y-4">
+                    <p className="text-sm font-semibold pl-4">filters</p>
+                    <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
+                </div>
             </div>
 		</div>
 	)
