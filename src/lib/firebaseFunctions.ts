@@ -40,14 +40,16 @@ export async function fetchClosetItems(userId: string, filters: Record<string, s
         const closetRef = collection(db, `users/${userId}/closet`);
         let closetQuery = query(closetRef);
 
+        // Apply category group filter if provided
         if (filters.Categories && filters.Categories.length > 0) {
-            const lowercaseCategories = filters.Categories.map(category => category.toLowerCase());
+            const lowercaseCategories = filters.Categories.map((category) => category.toLowerCase());
             closetQuery = query(closetQuery, where("categoryGroup", "in", lowercaseCategories));
         }
 
-        // Apply brand filter if brands are selected
+        // Apply brand filter if provided
         if (filters.Brand && filters.Brand.length > 0) {
-            closetQuery = query(closetQuery, where("brand", "in", filters.Brand));
+            const lowercaseBrands = filters.Brand.map((brand) => brand.toLowerCase());
+            closetQuery = query(closetQuery, where("brand", "in", lowercaseBrands));
         }
 
         const querySnapshot = await getDocs(closetQuery);
@@ -58,8 +60,14 @@ export async function fetchClosetItems(userId: string, filters: Record<string, s
                 id: doc.id,
                 name: data.name || "",
                 brand: data.brand || "",
-                category: data.category || "",
-                size: data.size || "",
+                category: {
+                    group: data.category.group || "",
+                    value: data.category.value || "",
+                },
+                size: {
+                    group: data.size.group || "",
+                    value: data.size.value || "",
+                },
                 color: data.color || "",
                 condition: data.condition || "",
                 purchaseCost: data.purchaseCost || 0,

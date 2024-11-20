@@ -62,7 +62,7 @@ export default function NavBar() {
     return (
         <>
             {/* Desktop Side Navigation */}
-            <div className="hidden md:flex flex-col h-screen w-64 p-8 space-y-8">
+            <div className="hidden md:flex flex-col h-screen w-48 flex-shrink-0 p-8 space-y-8">
                 <div>
                     <h1 className="text-sm font-semibold">worn</h1>
                     <h2 className="text-sm">fashion for you</h2>

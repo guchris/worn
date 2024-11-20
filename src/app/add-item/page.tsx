@@ -129,7 +129,7 @@ export default function AddItem() {
     return (
         <div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="w-full max-w-3xl p-8">
+            <div className="w-full max-w-3xl p-6 md:p-8">
                 <h1 className="text-sm font-semibold mb-6">add clothing item</h1>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

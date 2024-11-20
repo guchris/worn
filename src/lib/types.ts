@@ -10,8 +10,14 @@ export interface Item {
     id: string;
     name: string;
     brand: string;
-    category: string
-    size: string;
+    category: {
+        group: string;
+        value: string;
+    };
+    size: {
+        group: string;
+        value: string;
+    };
     color: string;
     condition: string;
     purchaseCost: number;
