@@ -19,7 +19,19 @@ export default function PlaygroundPage() {
             router.push("/auth/login");
         }
     }, [user, loading, router]);
-    
+
+    useEffect(() => {
+        // Prevent scrolling on mount
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
+
+        // Revert on unmount
+        return () => {
+            document.documentElement.style.overflow = "";
+            document.body.style.overflow = "";
+        };
+    }, []);
+
     if (loading) {
         return null;
     }

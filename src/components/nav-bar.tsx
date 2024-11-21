@@ -91,7 +91,7 @@ export default function NavBar() {
                             </Button>
                         </SheetTrigger>
 
-                        <SheetContent side="left" className="flex flex-col space-y-4 w-full h-full p-4 pl-8">
+                        <SheetContent side="left" className="flex flex-col space-y-4 w-full h-full p-4 pl-8 z-[9999]">
                             <SheetTitle asChild>
                                 <VisuallyHidden>worn navigation menu</VisuallyHidden>
                             </SheetTitle>
