@@ -21,7 +21,10 @@ export default function NumbersPage() {
         }
     }, [user, loading, router]);
 
-	// Show nothing while redirecting
+    if (loading) {
+        return null;
+    }
+    
     if (!user) {
         return null;
     }
@@ -29,7 +32,7 @@ export default function NumbersPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <main className="flex-1 p-8 space-y-8">
+            <main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
                 <ClosetPieChart />
                 <ClosetBarChart />
             </main>

@@ -44,9 +44,11 @@ export function ClosetPieChart() {
             try {
                 const closetRef = collection(db, "users", user.uid, "closet");
                 const snapshot = await getDocs(closetRef);
-
+                
+                // Initialize category counts
                 const categoryCounts = { tops: 0, bottoms: 0, accessories: 0 };
-
+                
+                // Count items per category
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     const categoryGroup = data.category?.group as keyof typeof categoryCounts;
@@ -55,6 +57,7 @@ export function ClosetPieChart() {
                     }
                 });
 
+                // Map category counts to chart data
                 const dataForChart = Object.entries(categoryCounts).map(([category, count]) => ({
                     category,
                     count,
@@ -71,15 +74,20 @@ export function ClosetPieChart() {
         fetchClosetData();
     }, [user]);
 
-    if (chartData.length === 0) {
-        return <p className="text-center">no items in your closet yet</p>;
-    }
+    // Ensure chart always shows all categories with a count of 0 if there's no data
+    const chartDataWithDefaults = chartData.length > 0 ? chartData : [
+        { category: "tops", count: 0, fill: "var(--color-tops)" },
+        { category: "bottoms", count: 0, fill: "var(--color-bottoms)" },
+        { category: "accessories", count: 0, fill: "var(--color-accessories)" },
+    ];
+
+    const totalItemsToDisplay = totalItems > 0 ? totalItems : 0;
 
     return (
         <Card className="flex flex-col shadow-none rounded-md">
-            <CardHeader className="text-left pb-0 space-y-0">
-                <CardTitle className="text-sm">closet breakdown</CardTitle>
-                <CardDescription className="text-sm">your item stats by category</CardDescription>
+            <CardHeader className="text-left pb-0">
+                <CardTitle>closet breakdown</CardTitle>
+                <CardDescription>your item stats by category</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
@@ -92,7 +100,7 @@ export function ClosetPieChart() {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Pie
-                            data={chartData}
+                            data={chartDataWithDefaults}
                             dataKey="count"
                             nameKey="category"
                             innerRadius={60}

@@ -91,7 +91,7 @@ export default function ClosetPage() {
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
 
-            <div className="w-full flex p-6 md:p-8">
+            <main className="flex-1 px-6 pb-6 space-y-6 md:space-y-0 md:p-8 md:flex md:gap-8">
                 {/* Closet Grid Section */}
                 <div className="flex-1 space-y-4">
                     <div className="flex items-center justify-between">
@@ -103,11 +103,11 @@ export default function ClosetPage() {
                     <ClosetGrid items={filteredItems} loading={closetLoading} />
                 </div>
                 {/* Filters Column */}
-                <div className="space-y-4">
-                    <p className="text-sm font-semibold pl-4 hidden md:block">filters</p>
+                <aside className="space-y-4">
+                    <p className="text-sm font-semibold hidden md:block">filters</p>
                     <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
-                </div>
-            </div>
+                </aside>
+            </main>
 		</div>
 	)
 }

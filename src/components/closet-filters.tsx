@@ -61,7 +61,7 @@ const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }
     };
 
     return (
-		<div className="hidden lg:block w-36 flex-shrink-0 space-y-6 pl-4">
+		<div className="hidden md:block w-36 flex-shrink-0 space-y-6">
             {filterData.map((filter) => (
                 <div key={filter.name}>
                     <div className="text-sm">{filter.name.toLowerCase()}</div>

@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation"
 import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
 
-
 export default function Home() {
+    
 	const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -30,9 +30,9 @@ export default function Home() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-			<div className="p-8">
+			<main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
                 <p className="hidden md:block text-sm">home</p>
-            </div>
+            </main>
 		</div>
 	)
 }

@@ -19,7 +19,10 @@ export default function GeneratorPage() {
         }
     }, [user, loading, router]);
 
-	// Show nothing while redirecting
+    if (loading) {
+        return null;
+    }
+
     if (!user) {
         return null;
     }
@@ -27,8 +30,9 @@ export default function GeneratorPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="p-8">
-            </div>
+            <main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
+                <p className="hidden md:block text-sm">generator</p>
+            </main>
 		</div>
 	)
 }

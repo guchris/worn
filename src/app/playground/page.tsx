@@ -19,8 +19,11 @@ export default function PlaygroundPage() {
             router.push("/auth/login");
         }
     }, [user, loading, router]);
+    
+    if (loading) {
+        return null;
+    }
 
-	// Show nothing while redirecting
     if (!user) {
         return null;
     }
