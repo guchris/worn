@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
 import { ClosetPieChart } from "@/components/chart-pie"
+import { ClosetBarChart } from "@/components/chart-bar"
 
 export default function NumbersPage() {
 
@@ -28,9 +29,10 @@ export default function NumbersPage() {
 	return (
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
-            <div className="p-8">
+            <main className="flex-1 p-8 space-y-8">
                 <ClosetPieChart />
-            </div>
+                <ClosetBarChart />
+            </main>
 		</div>
 	)
 }
