@@ -146,7 +146,7 @@ export default function AuthSignup() {
     }
 
     return (
-        <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="flex min-h-screen w-full items-center justify-center px-4">
             <Card className="mx-auto max-w-sm shadow-none">
                 <CardHeader>
                     <CardTitle className="text-2xl">sign up</CardTitle>
