@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 // App Imports
 import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
+import { ClosetPieChart } from "@/components/chart-pie"
 
 export default function NumbersPage() {
 
@@ -28,6 +29,7 @@ export default function NumbersPage() {
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
             <div className="p-8">
+                <ClosetPieChart />
             </div>
 		</div>
 	)

@@ -104,7 +104,7 @@ export default function ClosetPage() {
                 </div>
                 {/* Filters Column */}
                 <div className="space-y-4">
-                    <p className="text-sm font-semibold pl-4">filters</p>
+                    <p className="text-sm font-semibold pl-4 hidden md:block">filters</p>
                     <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
                 </div>
             </div>
