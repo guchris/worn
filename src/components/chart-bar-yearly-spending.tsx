@@ -39,7 +39,7 @@ const initializeMonths = (year: number) => {
     return months;
 };
 
-export function ClosetBarChart() {
+export function ClosetBarChartYearlySpending() {
     const { user } = useAuth();
     const [chartData2023, setChartData2023] = useState<any[]>([]);
     const [chartData2024, setChartData2024] = useState<any[]>([]);
@@ -65,17 +65,17 @@ export function ClosetBarChart() {
                 // Process Firestore data
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    const purchaseDate = data.purchaseDate; // ISO string
+                    const purchaseDate = data.purchaseDate; // "YYYY-MM-DD"
                     const purchaseCost = parseFloat(data.purchaseCost) || 0;
-    
+
                     if (purchaseDate && purchaseCost) {
-                        const date = new Date(purchaseDate);
-                        const monthIndex = date.getMonth(); // 0 = Jan, 11 = Dec
-    
-                        if (date.getFullYear() === 2023) {
+                        const [year, month] = purchaseDate.split("-").map(Number);
+                        const monthIndex = month - 1; // 0-based index for months
+
+                        if (year === 2023) {
                             aggregatedData2023[monthIndex].usd += purchaseCost;
                             total2023 += purchaseCost;
-                        } else if (date.getFullYear() === 2024) {
+                        } else if (year === 2024) {
                             aggregatedData2024[monthIndex].usd += purchaseCost;
                             total2024 += purchaseCost;
                         }

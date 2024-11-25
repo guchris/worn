@@ -33,7 +33,7 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ClosetPieChart() {
+export function ClosetPieChartTotalItems() {
     const { user } = useAuth();
     const [chartData, setChartData] = useState<any[]>([]);
     const [totalItems, setTotalItems] = useState(0);
@@ -84,7 +84,7 @@ export function ClosetPieChart() {
     const totalItemsToDisplay = totalItems > 0 ? totalItems : 0;
 
     return (
-        <Card className="flex flex-col shadow-none rounded-md">
+        <Card className="shadow-none rounded-md">
             <CardHeader className="text-left pb-0">
                 <CardTitle>closet breakdown</CardTitle>
                 <CardDescription>your item stats by category</CardDescription>

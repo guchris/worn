@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation"
 // App Imports
 import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
-import { ClosetPieChart } from "@/components/chart-pie"
-import { ClosetBarChart } from "@/components/chart-bar"
+import { ClosetPieChartTotalItems } from "@/components/chart-pie-total-items"
+import { ClosetBarChartThreeMonthsItems } from "@/components/chart-bar-three-months-items"
+import { ClosetBarChartThreeMonthsSpent } from "@/components/chart-bar-three-months-spent"
+import { ClosetBarChartYearlySpending } from "@/components/chart-bar-yearly-spending"
 
 export default function NumbersPage() {
 
@@ -33,8 +35,16 @@ export default function NumbersPage() {
 		<div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
             <main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
-                <ClosetPieChart />
-                <ClosetBarChart />
+                <ClosetPieChartTotalItems />
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1">
+                        <ClosetBarChartThreeMonthsItems />
+                    </div>
+                    <div className="flex-1">
+                        <ClosetBarChartThreeMonthsSpent />
+                    </div>
+                </div>
+                <ClosetBarChartYearlySpending />
             </main>
 		</div>
 	)
