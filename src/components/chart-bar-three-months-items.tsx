@@ -24,18 +24,17 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-// Helper function to get the past 3 months (including current month)
 const getPastThreeMonths = () => {
     const today = new Date();
     const months = [];
     for (let i = 2; i >= 0; i--) {
-        const date = new Date(today.getFullYear(), today.getMonth() - i, 1); // Go back i months
+        const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
         const year = date.getFullYear();
-        const month = date.toLocaleString("en-US", { month: "long" }); // Full month name
-        months.push({ year, month, items: 0, spent: 0 });
+        const month = date.toLocaleString("en-US", { month: "long" });
+        months.push({ year, month, items: 0, spent: 0, itemNames: [] as string[] });
     }
     return months;
-}
+};
 
 export function ClosetBarChartThreeMonthsItems() {
     const { user } = useAuth();
@@ -54,13 +53,16 @@ export function ClosetBarChartThreeMonthsItems() {
                 snapshot.forEach((doc) => {
                     const item = doc.data();
                     const purchaseDate = item.purchaseDate;
-
+                    const itemName = item.name || "Unnamed Item";
+                
                     if (purchaseDate) {
                         const date = new Date(purchaseDate);
                         const month = date.toLocaleString("en-US", { month: "long" });
-                        const monthData = data.find((d) => d.month === month);
+                        const year = date.getFullYear();
+                        const monthData = data.find((d) => d.month === month && d.year === year);
                         if (monthData) {
                             monthData.items += 1;
+                            monthData.itemNames.push(itemName);
                         }
                     }
                 });
@@ -99,7 +101,27 @@ export function ClosetBarChartThreeMonthsItems() {
                         />
                         <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
+                            content={({ payload, label }) => {
+                                if (!payload || payload.length === 0) return null;
+                                const monthData = payload[0].payload;
+
+                                return (
+                                    <div className="bg-white p-2 rounded shadow">
+                                        <p className="font-semibold">{label}</p>
+                                        <p>items: {monthData.items}</p>
+                                        <div>
+                                            <p>names:</p>
+                                            {monthData.itemNames.length > 0 ? (
+                                                monthData.itemNames.map((itemName: string, index: number) => (
+                                                    <p key={index} className="ml-2">• {itemName}</p>
+                                                ))
+                                            ) : (
+                                                <p className="ml-2">No items</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            }}
                         />
                         <Bar dataKey="items" fill="var(--color-items)" radius={8}>
                         <LabelList
