@@ -1,7 +1,7 @@
 "use client"
 
 // React Imports
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState } from "react"
 
 // App Imports
 import { useAuth } from "@/context/AuthContext"
@@ -159,7 +159,7 @@ export function ClosetBarChartYearlySpending() {
                             minTickGap={32}
                             tickFormatter={(value) => {
                                 const [year, month] = value.split("-");
-                                return new Date(year, month - 1).toLocaleString("en-US", { month: "short" });
+                                return new Date(year, month - 1).toLocaleString("en-US", { month: "short" }).toLowerCase();
                             }}
                         />
                         <ChartTooltip

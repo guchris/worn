@@ -12,82 +12,87 @@ import { db } from "@/lib/firebase"
 
 // Shadcn Imports
 import { Label, Pie, PieChart } from "recharts"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 const chartConfig = {
-    count: {
-        label: "items count",
+    amount: {
+        label: "amount spent",
     },
     tops: {
-        label: "tops",
         color: "hsl(var(--chart-1))",
     },
     bottoms: {
-        label: "bottoms",
         color: "hsl(var(--chart-2))",
     },
     accessories: {
-        label: "accessories",
         color: "hsl(var(--chart-3))",
     },
 } satisfies ChartConfig;
 
-export function ClosetPieChartTotalItems() {
+export function ClosetPieChartTotalSpent() {
     const { user } = useAuth();
     const [chartData, setChartData] = useState<any[]>([]);
-    const [totalItems, setTotalItems] = useState(0);
+    const [totalSpent, setTotalSpent] = useState(0);
 
     useEffect(() => {
         const fetchClosetData = async () => {
-            if (!user) return; // Ensure user is available before proceeding
+            if (!user) return;
             try {
                 const closetRef = collection(db, "users", user.uid, "closet");
                 const snapshot = await getDocs(closetRef);
-                
-                // Initialize category counts
-                const categoryCounts = { tops: 0, bottoms: 0, accessories: 0 };
-                
-                // Count items per category
+    
+                const categorySpending = { tops: 0, bottoms: 0, accessories: 0 };
+    
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    const categoryGroup = data.category?.group as keyof typeof categoryCounts;
-                    if (categoryCounts[categoryGroup] !== undefined) {
-                        categoryCounts[categoryGroup]++;
+                    console.log("Firestore Data:", data); // Log Firestore data
+                    const categoryGroup = data.category?.group as keyof typeof categorySpending;
+                    const price = data.purchaseCost || 0; // Ensure you're using the correct field
+                    if (categorySpending[categoryGroup] !== undefined) {
+                        categorySpending[categoryGroup] += price;
                     }
                 });
-
-                // Map category counts to chart data
-                const dataForChart = Object.entries(categoryCounts).map(([category, count]) => ({
+    
+                console.log("Category Spending:", categorySpending); // Log processed data
+    
+                const dataForChart = Object.entries(categorySpending).map(([category, amount]) => ({
                     category,
-                    count,
+                    amount,
                     fill: `var(--color-${category})`,
                 }));
-
+    
+                console.log("Chart Data for Pie:", dataForChart); // Log chart data
+    
                 setChartData(dataForChart);
-                setTotalItems(Object.values(categoryCounts).reduce((acc, curr) => acc + curr, 0));
+                setTotalSpent(Object.values(categorySpending).reduce((acc, curr) => acc + curr, 0));
             } catch (error) {
                 console.error("Error fetching closet data:", error);
             }
         };
-
+    
         fetchClosetData();
     }, [user]);
 
-    // Ensure chart always shows all categories with a count of 0 if there's no data
+    // Ensure chart always shows all categories with 0 spending if there's no data
     const chartDataWithDefaults = chartData.length > 0 ? chartData : [
-        { category: "tops", count: 0, fill: "var(--color-tops)" },
-        { category: "bottoms", count: 0, fill: "var(--color-bottoms)" },
-        { category: "accessories", count: 0, fill: "var(--color-accessories)" },
+        { category: "tops", amount: 0, fill: "hsl(var(--chart-1))" },
+        { category: "bottoms", amount: 0, fill: "hsl(var(--chart-2))" },
+        { category: "accessories", amount: 0, fill: "hsl(var(--chart-3))" },
     ];
 
-    const totalItemsToDisplay = totalItems > 0 ? totalItems : 0;
+    const formatTotalSpent = (total: number): string => {
+        if (total < 1000) {
+            return `$${Math.round(total)}`;
+        }
+        return `$${(total / 1000).toFixed(1)}k`;
+    };
 
     return (
         <Card className="shadow-none rounded-md">
             <CardHeader className="text-left pb-0">
-                <CardTitle>closet items</CardTitle>
-                <CardDescription>your item stats by category</CardDescription>
+                <CardTitle>closet spending</CardTitle>
+                <CardDescription>your spending stats by category</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
@@ -101,7 +106,7 @@ export function ClosetPieChartTotalItems() {
                         />
                         <Pie
                             data={chartDataWithDefaults}
-                            dataKey="count"
+                            dataKey="amount"
                             nameKey="category"
                             innerRadius={60}
                             strokeWidth={5}
@@ -121,14 +126,14 @@ export function ClosetPieChartTotalItems() {
                                                     y={viewBox.cy}
                                                     className="fill-foreground text-3xl font-bold"
                                                 >
-                                                    {totalItems.toLocaleString()}
+                                                    {formatTotalSpent(totalSpent)}
                                                 </tspan>
                                                 <tspan
                                                     x={viewBox.cx}
                                                     y={(viewBox.cy || 0) + 24}
                                                     className="fill-muted-foreground"
                                                 >
-                                                    total items
+                                                    total spent
                                                 </tspan>
                                             </text>
                                         )

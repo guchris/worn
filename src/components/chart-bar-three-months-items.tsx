@@ -30,7 +30,7 @@ const getPastThreeMonths = () => {
     for (let i = 2; i >= 0; i--) {
         const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
         const year = date.getFullYear();
-        const month = date.toLocaleString("en-US", { month: "long" });
+        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
         months.push({ year, month, items: 0, spent: 0, itemNames: [] as string[] });
     }
     return months;
@@ -57,7 +57,7 @@ export function ClosetBarChartThreeMonthsItems() {
                 
                     if (purchaseDate) {
                         const date = new Date(purchaseDate);
-                        const month = date.toLocaleString("en-US", { month: "long" });
+                        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
                         const year = date.getFullYear();
                         const monthData = data.find((d) => d.month === month && d.year === year);
                         if (monthData) {
