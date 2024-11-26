@@ -158,8 +158,8 @@ export function ClosetBarChartYearlySpending() {
                             tickMargin={8}
                             minTickGap={32}
                             tickFormatter={(value) => {
-                                const date = new Date(value);
-                                return date.toLocaleString("en-US", { month: "short" });
+                                const [year, month] = value.split("-");
+                                return new Date(year, month - 1).toLocaleString("en-US", { month: "short" });
                             }}
                         />
                         <ChartTooltip
