@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext"
 import { ClosetPieChartTotalItems } from "@/components/chart-pie-total-items"
 import { ClosetPieChartTotalSpent } from "@/components/chart-pie-total-spent"
 import { ClosetBarChartTopBrands } from "@/components/chart-bar-top-brands"
+import { ClosetBarChartTopCategories } from "@/components/chart-bar-top-categories"
 import { ClosetBarChartThreeMonthsItems } from "@/components/chart-bar-three-months-items"
 import { ClosetBarChartThreeMonthsSpent } from "@/components/chart-bar-three-months-spent"
 import { ClosetBarChartYearlySpending } from "@/components/chart-bar-yearly-spending"
@@ -45,7 +46,14 @@ export default function NumbersPage() {
                         <ClosetPieChartTotalSpent />
                     </div>
                 </div>
-                <ClosetBarChartTopBrands />
+                <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1">
+                        <ClosetBarChartTopBrands />
+                    </div>
+                    <div className="flex-1">
+                        <ClosetBarChartTopCategories />
+                    </div>
+                </div>
                 <div className="flex flex-col md:flex-row gap-6">
                     <div className="flex-1">
                         <ClosetBarChartThreeMonthsItems />
