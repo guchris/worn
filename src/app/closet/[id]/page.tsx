@@ -11,8 +11,8 @@ import NavBar from "@/components/nav-bar"
 import { useAuth } from "@/context/AuthContext"
 
 // Firebase Imports
-import { doc, getDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { doc, getDoc } from "firebase/firestore"
 
 export default function ItemPage() {
     const { id } = useParams();
@@ -57,19 +57,28 @@ export default function ItemPage() {
     }, [user, loading, id, router]);
 
     if (loading || fetching) {
-        return <p>loading</p>
+        return
     }
 
     if (!item) {
-        return <p>item not found</p>
+        return
     }
 
     return (
         <div className="relative flex flex-col md:flex-row min-h-screen overflow-hidden">
             <NavBar />
             <main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
-                <h1 className="text-xs font-semibold">{item.name}</h1>
-                <p className="text-xs">{item.brand}</p>
+                <div>
+                    <h1 className="text-xs font-semibold">name: {item.name}</h1>
+                    <p className="text-xs">brand: {item.brand}</p>
+                    <p className="text-xs">main category: {item.category.group}</p>
+                    <p className="text-xs">sub category: {item.category.value}</p>
+                    <p className="text-xs">size: {item.size.value}</p>
+                    <p className="text-xs">color: {item.color}</p>
+                    <p className="text-xs">condition: {item.condition}</p>
+                    <p className="text-xs">cost: {item.purchaseCost}</p>
+                    <p className="text-xs">date: {item.purchaseDate}</p>
+                </div>
                 {item.images?.[0] && (
                     <Image
                         src={item.images[0]}
@@ -81,5 +90,5 @@ export default function ItemPage() {
                 )}
             </main>
 		</div>
-    );
+    )
 }
