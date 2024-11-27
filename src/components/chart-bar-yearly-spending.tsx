@@ -27,6 +27,10 @@ const chartConfig = {
         label: "2023",
         color: "hsl(var(--chart-2))",
     },
+    2022: {
+        label: "2022",
+        color: "hsl(var(--chart-3))",
+    },
 } satisfies ChartConfig;
 
 // Helper function to initialize months
@@ -41,11 +45,13 @@ const initializeMonths = (year: number) => {
 
 export function ClosetBarChartYearlySpending() {
     const { user } = useAuth();
+    const [chartData2022, setChartData2022] = useState<any[]>([]);
     const [chartData2023, setChartData2023] = useState<any[]>([]);
     const [chartData2024, setChartData2024] = useState<any[]>([]);
+    const [totalSpent2022, setTotalSpent2022] = useState(0);
     const [totalSpent2023, setTotalSpent2023] = useState(0);
     const [totalSpent2024, setTotalSpent2024] = useState(0);
-    const [activeYear, setActiveYear] = useState<"2024" | "2023">("2024");
+    const [activeYear, setActiveYear] = useState<"2024" | "2023" | "2022">("2024");
 
     useEffect(() => {
         const fetchClosetData = async () => {
@@ -56,9 +62,11 @@ export function ClosetBarChartYearlySpending() {
                 const snapshot = await getDocs(closetRef);
     
                 // Initialize months
+                const aggregatedData2022 = initializeMonths(2022);
                 const aggregatedData2023 = initializeMonths(2023);
                 const aggregatedData2024 = initializeMonths(2024);
-    
+                
+                let total2022 = 0;
                 let total2023 = 0;
                 let total2024 = 0;
     
@@ -71,8 +79,12 @@ export function ClosetBarChartYearlySpending() {
                     if (purchaseDate && purchaseCost) {
                         const [year, month] = purchaseDate.split("-").map(Number);
                         const monthIndex = month - 1; // 0-based index for months
-
-                        if (year === 2023) {
+                        
+                        if (year === 2022) {
+                            aggregatedData2022[monthIndex].usd += purchaseCost;
+                            total2022 += purchaseCost;
+                        }
+                        else if (year === 2023) {
                             aggregatedData2023[monthIndex].usd += purchaseCost;
                             total2023 += purchaseCost;
                         } else if (year === 2024) {
@@ -83,16 +95,20 @@ export function ClosetBarChartYearlySpending() {
                 });
     
                 // Ensure data is sorted by date
+                const chartData2022 = aggregatedData2022.sort(
+                    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+                );
                 const chartData2023 = aggregatedData2023.sort(
                     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
                 );
-    
                 const chartData2024 = aggregatedData2024.sort(
                     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
                 );
-    
+                
+                setChartData2022(chartData2022);
                 setChartData2023(chartData2023);
                 setChartData2024(chartData2024);
+                setTotalSpent2022(total2022);
                 setTotalSpent2023(total2023);
                 setTotalSpent2024(total2024);
             } catch (error) {
@@ -103,8 +119,19 @@ export function ClosetBarChartYearlySpending() {
         fetchClosetData();
     }, [user]);
 
-    const activeChartData = activeYear === "2024" ? chartData2024 : chartData2023;
-    const activeTotalSpent = activeYear === "2024" ? totalSpent2024 : totalSpent2023;
+    const activeChartData = 
+        activeYear === "2024"
+            ? chartData2024
+            : activeYear === "2023"
+            ? chartData2023
+            : chartData2022;
+
+    const activeTotalSpent =
+        activeYear === "2024"
+            ? totalSpent2024
+            : activeYear === "2023"
+            ? totalSpent2023
+            : totalSpent2022;
 
     return (
         <Card className="shadow-none rounded-md">
@@ -116,12 +143,12 @@ export function ClosetBarChartYearlySpending() {
                     </CardDescription>
                 </div>
                 <div className="flex">
-                    {["2024", "2023"].map((year) => (
+                    {["2024", "2023", "2022"].map((year) => (
                         <button
                             key={year}
                             data-active={activeYear === year}
                             className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                            onClick={() => setActiveYear(year as "2024" | "2023")}
+                            onClick={() => setActiveYear(year as "2024" | "2023" | "2022")}
                         >
                             <span className="text-xs text-muted-foreground">
                                 {chartConfig[year as keyof typeof chartConfig].label}
@@ -131,7 +158,9 @@ export function ClosetBarChartYearlySpending() {
                                     ? activeTotalSpent.toLocaleString()
                                     : year === "2024"
                                     ? totalSpent2024.toLocaleString()
-                                    : totalSpent2023.toLocaleString()}
+                                    : year === "2023"
+                                    ? totalSpent2023.toLocaleString()
+                                    : totalSpent2022.toLocaleString()}
                             </span>
                         </button>
                     ))}
