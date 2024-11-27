@@ -1,5 +1,7 @@
 // Next Imports
+import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 // App Imports
 import { Item } from "@/lib/types"
@@ -14,6 +16,13 @@ interface ClosetGridProps {
 }
 
 const ClosetGrid = ({ items, loading }: ClosetGridProps) => {
+
+    const router = useRouter();
+
+    const handleItemClick = (id: string) => {
+        router.push(`/closet/${id}`);
+    };
+
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {loading ? (
@@ -29,8 +38,12 @@ const ClosetGrid = ({ items, loading }: ClosetGridProps) => {
                     </div>
                 ))
             ) : (
-                items.map((item) => (
-                    <Card key={item.id} className="shadow-none rounded-md flex flex-col items-start">
+                items.map((item) => (    
+                    <Card
+                        key={item.id}
+                        className="shadow-none rounded-md flex flex-col items-start"
+                        onClick={() => handleItemClick(item.id)}
+                    >
                             
                         {/* Item Image */}
                         {item.images?.[0] && (
