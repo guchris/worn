@@ -9,6 +9,8 @@ import { fetchUniqueBrands } from "@/lib/firebaseFunctions"
 interface ClosetFiltersProps {
     userId: string;
     onFiltersChange: (filters: Record<string, string[]>) => void;
+    sortOption: string;
+    onSortChange: (sort: string) => void;
 }
 
 interface FilterItem {
@@ -16,7 +18,7 @@ interface FilterItem {
     items: string[];
 }
 
-const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }) => {
+const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange, sortOption, onSortChange }) => {
     const [filterData, setFilterData] = useState<FilterItem[]>([
         { name: "Categories", items: ["Tops", "Bottoms", "Accessories"] },
         { name: "Brand", items: [] },
@@ -62,6 +64,30 @@ const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange }
 
     return (
 		<div className="hidden md:block w-36 flex-shrink-0 space-y-6">
+            <div>
+                <div className="text-sm">sort</div>
+                <div className="mt-2">
+                    {["date", "reverseDate", "mostExpensive", "leastExpensive"].map((sort) => (
+                        <button
+                            key={sort}
+                            onClick={() => onSortChange(sort)}
+                            className={`text-sm text-left block ${
+                                sortOption === sort
+                                    ? "font-bold text-green-500"
+                                    : "text-gray-500"
+                            }`}
+                        >
+                            {sort === "date"
+                                ? "newest"
+                                : sort === "reverseDate"
+                                ? "oldest"
+                                : sort === "mostExpensive"
+                                ? "$$$ - $"
+                                : "$ - $$$"}
+                        </button>
+                    ))}
+                </div>
+            </div>
             {filterData.map((filter) => (
                 <div key={filter.name}>
                     <div className="text-sm">{filter.name.toLowerCase()}</div>

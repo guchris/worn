@@ -25,6 +25,7 @@ export default function ClosetPage() {
 		Categories: [],
 		Brand: [],
 	});
+    const [sortOption, setSortOption] = useState<string>("date");
 
 	useEffect(() => {
         if (!loading && !user) {
@@ -75,11 +76,34 @@ export default function ClosetPage() {
         return categoryMatch && brandMatch;
     });
 
-    console.log("Filtered items:", filteredItems);
-
 	// Handle filter change
 	const handleFilterChange = (filters: Record<string, string[]>) => {
         setActiveFilters(filters);
+    };
+
+    const sortedItems = filteredItems.sort((a, b) => {
+        switch (sortOption) {
+            case "date":
+                if (a.purchaseDate === b.purchaseDate) {
+                    return a.name.localeCompare(b.name);
+                }
+                return new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime();
+            case "reverseDate":
+                if (a.purchaseDate === b.purchaseDate) {
+                    return b.name.localeCompare(a.name);
+                }
+                return new Date(a.purchaseDate).getTime() - new Date(b.purchaseDate).getTime();
+            case "mostExpensive":
+                return b.purchaseCost - a.purchaseCost;
+            case "leastExpensive":
+                return a.purchaseCost - b.purchaseCost;
+            default:
+                return 0;
+        }
+    });
+
+    const handleSortChange = (sort: string) => {
+        setSortOption(sort);
     };
 
 	// Show nothing while redirecting
@@ -105,7 +129,12 @@ export default function ClosetPage() {
                 {/* Filters Column */}
                 <aside className="space-y-4">
                     <p className="text-sm font-semibold hidden md:block">filters</p>
-                    <ClosetFilters userId={user.uid} onFiltersChange={handleFilterChange} />
+                    <ClosetFilters
+                        userId={user.uid}
+                        onFiltersChange={handleFilterChange}
+                        sortOption={sortOption}
+                        onSortChange={handleSortChange}
+                    />
                 </aside>
             </main>
 		</div>
