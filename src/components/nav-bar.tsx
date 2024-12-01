@@ -36,7 +36,14 @@ const NavLinks = () => {
     return (
         <>
             <Link href="/home" className={getLinkClass("/home")}>home</Link>
-            <Link href="/closet" className={getLinkClass("/closet")}>closet</Link>
+            <Link
+                href="/closet"
+                className={`text-sm ${
+                    currentPath.startsWith("/closet") ? "font-bold text-green-500" : "text-gray-500"
+                }`}
+            >
+                closet
+            </Link>
             <Link href="/playground" className={getLinkClass("/playground")}>playground</Link>
             <Link href="/generator" className={getLinkClass("/generator")}>generator</Link>
             <Link href="/numbers" className={getLinkClass("/numbers")}>numbers</Link>

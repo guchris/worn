@@ -41,7 +41,7 @@ const ClosetGrid = ({ items, loading }: ClosetGridProps) => {
                 items.map((item) => (    
                     <Card
                         key={item.id}
-                        className="shadow-none rounded-md flex flex-col items-start"
+                        className="shadow-none rounded-md flex flex-col items-start cursor-pointer"
                         onClick={() => handleItemClick(item.id)}
                     >
                             
