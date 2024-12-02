@@ -14,6 +14,9 @@ import { useAuth } from "@/context/AuthContext"
 import { db } from "@/lib/firebase"
 import { doc, getDoc } from "firebase/firestore"
 
+// Shadcn Imports
+import { Card, CardContent } from "@/components/ui/card"
+
 export default function ItemPage() {
     const { id } = useParams();
     const { user, loading } = useAuth();
@@ -95,13 +98,17 @@ export default function ItemPage() {
                     </div>
                 </div>
                 {item.images?.[0] && (
-                    <Image
-                        src={item.images[0]}
-                        alt={item.name}
-                        width={300}
-                        height={400}
-                        className="object-cover rounded-md"
-                    />
+                    <Card className="shadow-none rounded-md md:w-[300px]">
+                        <CardContent className="p-0">
+                            <Image
+                                src={item.images[0]}
+                                alt={item.name}
+                                width={300}
+                                height={400}
+                                className="object-cover rounded-md w-full h-auto"
+                            />
+                        </CardContent>
+                    </Card>
                 )}
             </main>
 		</div>
