@@ -75,28 +75,29 @@ export default function ItemPage() {
                     <p className="text-xs font-semibold">{item.brand}</p>
                     <p className="text-xs">{item.name}</p>
                 </div>
-                <div>
-                    {/* Container for aligned labels and values */}
-                    <div className="grid grid-cols-[max-content_1fr] gap-x-8">
-                        <p className="text-xs font-semibold">category</p>
-                        <p className="text-xs">{item.category.group} / {item.category.value}</p>
+                <Card className="shadow-none rounded-md md:w-[300px]">
+                    <CardContent className="p-4">
+                        <div className="grid grid-cols-[max-content_1fr] gap-x-8">
+                            <p className="text-xs font-semibold">category</p>
+                            <p className="text-xs">{item.category.group} / {item.category.value}</p>
 
-                        <p className="text-xs font-semibold">size</p>
-                        <p className="text-xs">{item.size.value}</p>
+                            <p className="text-xs font-semibold">size</p>
+                            <p className="text-xs">{item.size.value}</p>
 
-                        <p className="text-xs font-semibold">color</p>
-                        <p className="text-xs">{item.color.toLowerCase()}</p>
+                            <p className="text-xs font-semibold">color</p>
+                            <p className="text-xs">{item.color}</p>
 
-                        <p className="text-xs font-semibold">condition</p>
-                        <p className="text-xs">{item.condition}</p>
+                            <p className="text-xs font-semibold">condition</p>
+                            <p className="text-xs">{item.condition}</p>
 
-                        <p className="text-xs font-semibold">cost</p>
-                        <p className="text-xs">${item.purchaseCost}</p>
+                            <p className="text-xs font-semibold">cost</p>
+                            <p className="text-xs">${item.purchaseCost}</p>
 
-                        <p className="text-xs font-semibold">date</p>
-                        <p className="text-xs">{item.purchaseDate}</p>
-                    </div>
-                </div>
+                            <p className="text-xs font-semibold">date</p>
+                            <p className="text-xs">{item.purchaseDate}</p>
+                        </div>
+                    </CardContent>
+                </Card>
                 {item.images?.[0] && (
                     <Card className="shadow-none rounded-md md:w-[300px]">
                         <CardContent className="p-0">
