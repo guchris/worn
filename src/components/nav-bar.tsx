@@ -38,7 +38,7 @@ const NavLinks = () => {
             <Link href="/home" className={getLinkClass("/home")}>home</Link>
             <Link
                 href="/closet"
-                className={`text-sm ${
+                className={`${
                     currentPath.startsWith("/closet") ? "font-bold text-green-500" : "text-black"
                 }`}
             >
