@@ -69,15 +69,30 @@ export default function ItemPage() {
             <NavBar />
             <main className="flex-1 px-6 pb-6 space-y-6 md:p-8">
                 <div>
-                    <h1 className="text-xs font-semibold">name: {item.name}</h1>
-                    <p className="text-xs">brand: {item.brand}</p>
-                    <p className="text-xs">main category: {item.category.group}</p>
-                    <p className="text-xs">sub category: {item.category.value}</p>
-                    <p className="text-xs">size: {item.size.value}</p>
-                    <p className="text-xs">color: {item.color}</p>
-                    <p className="text-xs">condition: {item.condition}</p>
-                    <p className="text-xs">cost: {item.purchaseCost}</p>
-                    <p className="text-xs">date: {item.purchaseDate}</p>
+                    <p className="text-xs font-semibold">{item.brand}</p>
+                    <p className="text-xs">{item.name}</p>
+                </div>
+                <div>
+                    {/* Container for aligned labels and values */}
+                    <div className="grid grid-cols-[max-content_1fr] gap-x-8">
+                        <p className="text-xs font-semibold">category</p>
+                        <p className="text-xs">{item.category.group} / {item.category.value}</p>
+
+                        <p className="text-xs font-semibold">size</p>
+                        <p className="text-xs">{item.size.value}</p>
+
+                        <p className="text-xs font-semibold">color</p>
+                        <p className="text-xs">{item.color.toLowerCase()}</p>
+
+                        <p className="text-xs font-semibold">condition</p>
+                        <p className="text-xs">{item.condition}</p>
+
+                        <p className="text-xs font-semibold">cost</p>
+                        <p className="text-xs">${item.purchaseCost}</p>
+
+                        <p className="text-xs font-semibold">date</p>
+                        <p className="text-xs">{item.purchaseDate}</p>
+                    </div>
                 </div>
                 {item.images?.[0] && (
                     <Image
