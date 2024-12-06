@@ -8,7 +8,7 @@ import { fetchUniqueBrands } from "@/lib/firebaseFunctions"
 
 // Shadcn Imports
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ClosetFiltersProps {
     userId: string;
@@ -68,71 +68,58 @@ const ClosetFilters: React.FC<ClosetFiltersProps> = ({ userId, onFiltersChange, 
 
     return (
         <>
-            <div className="block md:hidden space-x-2">
+            <div className="block md:hidden flex items-center space-x-2">
 
-                {/* Sort Dropdown */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 text-sm border rounded-md">
-                        sort
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        {["date", "reverseDate", "mostExpensive", "leastExpensive"].map((sort) => (
-                            <DropdownMenuItem
-                                key={sort}
-                                onClick={() => onSortChange(sort)}
-                                className={sortOption === sort ? "font-bold text-green-500" : ""}
-                            >
-                                {sort === "date"
-                                    ? "newest"
-                                    : sort === "reverseDate"
-                                    ? "oldest"
-                                    : sort === "mostExpensive"
-                                    ? "$$$ - $"
-                                    : "$ - $$$"}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                {/* Sort Filter */}
+                <Select value={sortOption} onValueChange={(value) => onSortChange(value)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="sort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="date">newest</SelectItem>
+                        <SelectItem value="reverseDate">oldest</SelectItem>
+                        <SelectItem value="mostExpensive">$$$ - $</SelectItem>
+                        <SelectItem value="leastExpensive">$ - $$$</SelectItem>
+                    </SelectContent>
+                </Select>
 
-                {/* Category Dropdown */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 text-sm border rounded-md">
-                        categories
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                {/* Categories Filter */}
+                <Select
+                    value={activeFilters.Categories[0] || ""}
+                    onValueChange={(value) =>
+                        setActiveFilters((prev) => ({ ...prev, Categories: [value] }))
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="categories" />
+                    </SelectTrigger>
+                    <SelectContent>
                         {filterData[0].items.map((category) => (
-                            <DropdownMenuItem
-                                key={category}
-                                onClick={(e) => {
-                                    e.preventDefault(); // Ensure the click event doesn't bubble
-                                    console.log("Category selected:", category);
-                                    toggleFilter("Categories", category);
-                                }}
-                                className={activeFilters.Categories.includes(category) ? "font-bold text-green-500" : ""}
-                            >
+                            <SelectItem key={category} value={category}>
                                 {category}
-                            </DropdownMenuItem>
+                            </SelectItem>
                         ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    </SelectContent>
+                </Select>
 
-                {/* Brand Dropdown */}
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="px-4 py-2 text-sm border rounded-md">
-                        brands
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                {/* Brand Filter */}
+                <Select
+                    value={activeFilters.Brand[0] || ""}
+                    onValueChange={(value) =>
+                        setActiveFilters((prev) => ({ ...prev, Brand: [value] }))
+                    }
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="brands" />
+                    </SelectTrigger>
+                    <SelectContent>
                         {filterData[1].items.map((brand) => (
-                            <DropdownMenuItem
-                                key={brand}
-                                onClick={() => toggleFilter("Brand", brand)}
-                                className={activeFilters.Brand.includes(brand) ? "font-bold text-green-500" : ""}
-                            >
+                            <SelectItem key={brand} value={brand}>
                                 {brand}
-                            </DropdownMenuItem>
+                            </SelectItem>
                         ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    </SelectContent>
+                </Select>
 
                 {/* Clear All Button */}
                 <Button
